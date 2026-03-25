@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-whatchanged(1)">
+    <title>git-whatchanged(1)</title>
+<indexterm>
+<primary>git-whatchanged(1)</primary>
+</indexterm>
+<simplesect id="git-whatchanged(1)__name">
+<title>NAME</title>
+<simpara>git-whatchanged - Show logs with differences each commit introduces</simpara>
+</simplesect>
+<simplesect id="git-whatchanged(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><code>git</code> <code>whatchanged</code> <emphasis>&lt;option&gt;</emphasis><code>&#8230;</code></literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-whatchanged(1)__warning">
+<title>WARNING</title>
+<simpara><emphasis>git whatchanged</emphasis> has been deprecated and is scheduled for removal in
+a future version of Git, as it is merely <emphasis>git log</emphasis> with different
+defaults.</simpara>
+</simplesect>
+<simplesect id="git-whatchanged(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Shows commit logs and diff output each commit introduces.</simpara>
+<simpara>New users are encouraged to use <xref linkend="git-log(1)" /> instead.  The
+<emphasis>whatchanged</emphasis> command is essentially the same as <xref linkend="git-log(1)" />
+but defaults to showing the raw format diff output and skipping merges:</simpara>
+<screen>git log --raw --no-merges</screen>
+<simpara>The command is primarily kept for historical reasons; fingers of
+many people who learned Git long before <emphasis>git log</emphasis> was invented by
+reading the Linux kernel mailing list are trained to type it.</simpara>
+</simplesect>
+<simplesect id="git-whatchanged(1)__examples">
+<title>Examples</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>git whatchanged -p v2.6.12.. include/scsi drivers/scsi</emphasis>
+</term>
+<listitem>
+<simpara>
+        Show as patches the commits since version <emphasis>v2.6.12</emphasis> that changed
+        any file in the include/scsi or drivers/scsi subdirectories
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git whatchanged --since="2 weeks ago" -- gitk</emphasis>
+</term>
+<listitem>
+<simpara>
+        Show the changes during the last two weeks to the file <emphasis>gitk</emphasis>.
+        The "--" is necessary to avoid confusion with the <emphasis role="strong">branch</emphasis> named
+        <emphasis>gitk</emphasis>
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-whatchanged(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

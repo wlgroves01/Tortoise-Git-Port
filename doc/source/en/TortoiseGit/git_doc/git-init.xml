@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-init(1)">
+    <title>git-init(1)</title>
+<indexterm>
+<primary>git-init(1)</primary>
+</indexterm>
+<simplesect id="git-init(1)__name">
+<title>NAME</title>
+<simpara>git-init - Create an empty Git repository or reinitialize an existing one</simpara>
+</simplesect>
+<simplesect id="git-init(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><code>git</code> <code>init</code> [<code>-q</code> | <code>--quiet</code>] [<code>--bare</code>] [<code>--template=</code><emphasis>&lt;template-directory&gt;</emphasis>]
+         [<code>--separate-git-dir</code> <emphasis>&lt;git-dir&gt;</emphasis>] [<code>--object-format=</code><emphasis>&lt;format&gt;</emphasis>]
+         [<code>--ref-format=</code><emphasis>&lt;format&gt;</emphasis>]
+         [<code>-b</code> <emphasis>&lt;branch-name&gt;</emphasis> | <code>--initial-branch=</code><emphasis>&lt;branch-name&gt;</emphasis>]
+         [<code>--shared</code>[<code>=</code><emphasis>&lt;permissions&gt;</emphasis>]] [<emphasis>&lt;directory&gt;</emphasis>]</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-init(1)__description">
+<title>DESCRIPTION</title>
+<simpara>This command creates an empty Git repository - basically a <emphasis>.git</emphasis>
+directory with subdirectories for <emphasis>objects</emphasis>, <emphasis>refs/heads</emphasis>,
+<emphasis>refs/tags</emphasis>, and template files.  An initial branch without any
+commits will be created (see the <emphasis>--initial-branch</emphasis> option below
+for its name).</simpara>
+<simpara>If the <emphasis>GIT_DIR</emphasis> environment variable is set then it specifies a path
+to use instead of <emphasis>./.git</emphasis> for the base of the repository.</simpara>
+<simpara>If the object storage directory is specified via the
+<emphasis>GIT_OBJECT_DIRECTORY</emphasis> environment variable then the sha1 directories
+are created underneath; otherwise, the default <emphasis>$GIT_DIR/objects</emphasis>
+directory is used.</simpara>
+<simpara>Running <emphasis>git init</emphasis> in an existing repository is safe. It will not
+overwrite things that are already there. The primary reason for
+rerunning <emphasis>git init</emphasis> is to pick up newly added templates (or to move
+the repository to another place if <emphasis>--separate-git-dir</emphasis> is given).</simpara>
+</simplesect>
+<simplesect id="git-init(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>-q</emphasis>
+</term>
+<term>
+<emphasis>--quiet</emphasis>
+</term>
+<listitem>
+<simpara>
+Only print error and warning messages; all other output will be suppressed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--bare</emphasis>
+</term>
+<listitem>
+<simpara>
+Create a bare repository. If <emphasis>GIT_DIR</emphasis> environment is not set, it is set to the
+current working directory.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--object-format=&lt;format&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+Specify the given object <emphasis>&lt;format&gt;</emphasis> (hash algorithm) for the repository.  The valid
+values are <emphasis>sha1</emphasis> and (if enabled) <emphasis>sha256</emphasis>.  <emphasis>sha1</emphasis> is the default.
+</simpara>
+<simpara>Note: At present, there is no interoperability between SHA-256
+repositories and SHA-1 repositories.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Historically, we warned that SHA-256 repositories may later need
+backward incompatible changes when we introduce such interoperability
+features. Today, we only expect compatible changes. Furthermore, if such
+changes prove to be necessary, it can be expected that SHA-256 repositories
+created with today's Git will be usable by future versions of Git
+without data loss.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>--ref-format=&lt;format&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+Specify the given ref storage <emphasis>&lt;format&gt;</emphasis> for the repository. The valid values are:
+</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+<emphasis>files</emphasis> for loose files with packed-refs. This is the default.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<emphasis>reftable</emphasis> for the reftable format. This format is experimental and its
+  internals are subject to change.
+</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--template=&lt;template-directory&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+Specify the directory from which templates will be used.  (See the "TEMPLATE
+DIRECTORY" section below.)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--separate-git-dir=&lt;git-dir&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+Instead of initializing the repository as a directory to either <emphasis>$GIT_DIR</emphasis> or
+<emphasis>./.git/</emphasis>, create a text file there containing the path to the actual
+repository.  This file acts as a filesystem-agnostic Git symbolic link to the
+repository.
+</simpara>
+<simpara>If this is a reinitialization, the repository will be moved to the specified path.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-b &lt;branch-name&gt;</emphasis>
+</term>
+<term>
+<emphasis>--initial-branch=&lt;branch-name&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+Use <emphasis>&lt;branch-name&gt;</emphasis> for the initial branch in the newly created
+repository.  If not specified, fall back to the default name
+(currently <emphasis>master</emphasis>, but this will change to <emphasis>main</emphasis> when Git 3.0 is released).
+The default name can be customized via the <emphasis>init.defaultBranch</emphasis> configuration
+variable.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--shared[=(false|true|umask|group|all|world|everybody|&lt;perm&gt;)]</emphasis>
+</term>
+<listitem>
+<simpara>
+Specify that the Git repository is to be shared amongst several users.  This
+allows users belonging to the same group to push into that
+repository.  When specified, the config variable <emphasis>core.sharedRepository</emphasis> is
+set so that files and directories under <emphasis>$GIT_DIR</emphasis> are created with the
+requested permissions.  When not specified, Git will use permissions reported
+by <emphasis>umask</emphasis>(2).
+</simpara>
+<simpara>The option can have the following values, defaulting to <emphasis>group</emphasis> if no value
+is given:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>umask</emphasis>
+</term>
+<term>
+<emphasis>false</emphasis>
+</term>
+<listitem>
+<simpara>
+Use permissions reported by <emphasis>umask</emphasis>(2). The default, when <emphasis>--shared</emphasis> is not
+specified.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>group</emphasis>
+</term>
+<term>
+<emphasis>true</emphasis>
+</term>
+<listitem>
+<simpara>
+Make the repository group-writable, (and <emphasis>g+sx</emphasis>, since the git group may not be
+the primary group of all users). This is used to loosen the permissions of an
+otherwise safe <emphasis>umask</emphasis>(2) value. Note that the umask still applies to the other
+permission bits (e.g. if umask is <emphasis>0022</emphasis>, using <emphasis>group</emphasis> will not remove read
+privileges from other (non-group) users). See <emphasis>0xxx</emphasis> for how to exactly specify
+the repository permissions.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>all</emphasis>
+</term>
+<term>
+<emphasis>world</emphasis>
+</term>
+<term>
+<emphasis>everybody</emphasis>
+</term>
+<listitem>
+<simpara>
+Same as <emphasis>group</emphasis>, but make the repository readable by all users.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>&lt;perm&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+<emphasis>&lt;perm&gt;</emphasis> is a 3-digit octal number prefixed with 0` and each file
+will have mode <emphasis>&lt;perm&gt;</emphasis>. <emphasis>&lt;perm&gt;</emphasis> will override users <emphasis>umask</emphasis>(2)
+value (and not only loosen permissions as <emphasis>group</emphasis> and <emphasis>all</emphasis>
+do). <emphasis>0640</emphasis> will create a repository which is group-readable, but
+not group-writable or accessible to others. <emphasis>0660</emphasis> will create a repo
+that is readable and writable to the current user and group, but
+inaccessible to others (directories and executable files get their
+<emphasis>x</emphasis> bit from the <emphasis>r</emphasis> bit for corresponding classes of users).
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>By default, the configuration flag <emphasis>receive.denyNonFastForwards</emphasis> is enabled
+in shared repositories, so that you cannot force a non fast-forwarding push
+into it.</simpara>
+<simpara>If you provide a <emphasis>&lt;directory&gt;</emphasis>, the command is run inside it. If this directory
+does not exist, it will be created.</simpara>
+</simplesect>
+<simplesect id="git-init(1)__template_directory">
+<title>TEMPLATE DIRECTORY</title>
+<simpara>Files and directories in the template directory whose name do not start with a
+dot will be copied to the <emphasis>$GIT_DIR</emphasis> after it is created.</simpara>
+<simpara>The template directory will be one of the following (in order):</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+the argument given with the <emphasis>--template</emphasis> option;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the contents of the <emphasis>$GIT_TEMPLATE_DIR</emphasis> environment variable;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the <emphasis>init.templateDir</emphasis> configuration variable; or
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the default template directory: <emphasis>/usr/share/git-core/templates</emphasis>.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>The default template directory includes some directory structure, suggested
+"exclude patterns" (see <xref linkend="gitignore(5)" />), and sample hook files.</simpara>
+<simpara>The sample hooks are all disabled by default. To enable one of the
+sample hooks rename it by removing its <emphasis>.sample</emphasis> suffix.</simpara>
+<simpara>See <xref linkend="githooks(5)" /> for more general info on hook execution.</simpara>
+</simplesect>
+<simplesect id="git-init(1)__examples">
+<title>EXAMPLES</title>
+<variablelist>
+<varlistentry>
+<term>
+Start a new Git repository for an existing code base
+</term>
+<listitem>
+<screen>$ cd /path/to/my/codebase
+$ git init      <co id="git-init_CO1-1"/>
+$ git add .     <co id="git-init_CO1-2"/>
+$ git commit    <co id="git-init_CO1-3"/></screen>
+<calloutlist>
+<callout arearefs="git-init_CO1-1">
+<para>
+Create a <emphasis>/path/to/my/codebase/.git</emphasis> directory.
+</para>
+</callout>
+<callout arearefs="git-init_CO1-2">
+<para>
+Add all existing files to the index.
+</para>
+</callout>
+<callout arearefs="git-init_CO1-3">
+<para>
+Record the pristine state as the first commit in the history.
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-init(1)__configuration">
+<title>CONFIGURATION</title>
+<simpara>Everything below this line in this section is selectively included
+from the <xref linkend="git-config(1)" /> documentation. The content is the same
+as what's found there:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>init.templateDir</emphasis>
+</term>
+<listitem>
+<simpara>
+        Specify the directory from which templates will be copied. 
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>init.defaultBranch</emphasis>
+</term>
+<listitem>
+<simpara>
+        Allows overriding the default branch name e.g. when initializing
+        a new repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>init.defaultObjectFormat</emphasis>
+</term>
+<listitem>
+<simpara>
+        Allows overriding the default object format for new repositories. See
+        <emphasis>--object-format=</emphasis> in <xref linkend="git-init(1)" />. Both the command line option
+        and the <emphasis>GIT_DEFAULT_HASH</emphasis> environment variable take precedence over
+        this config.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>init.defaultRefFormat</emphasis>
+</term>
+<listitem>
+<simpara>
+        Allows overriding the default ref storage format for new repositories.
+        See <emphasis>--ref-format=</emphasis> in <xref linkend="git-init(1)" />. Both the command line
+        option and the <emphasis>GIT_DEFAULT_REF_FORMAT</emphasis> environment variable take
+        precedence over this config.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-init(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

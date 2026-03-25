@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-pack-redundant(1)">
+    <title>git-pack-redundant(1)</title>
+<indexterm>
+<primary>git-pack-redundant(1)</primary>
+</indexterm>
+<simplesect id="git-pack-redundant(1)__name">
+<title>NAME</title>
+<simpara>git-pack-redundant - Find redundant pack files</simpara>
+</simplesect>
+<simplesect id="git-pack-redundant(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><emphasis>git pack-redundant</emphasis> [--verbose] [--alt-odb] (--all | &lt;pack-filename&gt;&#8230;)</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-pack-redundant(1)__warning">
+<title>WARNING</title>
+<simpara><emphasis>git pack-redundant</emphasis> has been deprecated and is scheduled for removal in
+a future version of Git. Because it can only remove entire duplicate
+packs and not individual duplicate objects, it is generally not a useful
+tool for reducing repository size. You are better off using <emphasis>git gc</emphasis> to
+do so, which will put objects into a new pack, removing duplicates.</simpara>
+<simpara>Running <emphasis>pack-redundant</emphasis> without the <emphasis>--i-still-use-this</emphasis> flag will fail
+in this release. If you believe you have a use case for which
+<emphasis>pack-redundant</emphasis> is better suited and oppose this removal, please
+contact the Git mailing list at <ulink url="mailto:git@vger.kernel.org">git@vger.kernel.org</ulink>. More information
+about the list is available at <ulink url="https://git-scm.com/community">https://git-scm.com/community</ulink>.</simpara>
+</simplesect>
+<simplesect id="git-pack-redundant(1)__description">
+<title>DESCRIPTION</title>
+<simpara>This program computes which packs in your repository
+are redundant. The output is suitable for piping to
+<emphasis>xargs rm</emphasis> if you are in the root of the repository.</simpara>
+<simpara><emphasis>git pack-redundant</emphasis> accepts a list of objects on standard input. Any objects
+given will be ignored when checking which packs are required. This makes the
+following command useful when wanting to remove packs which contain unreachable
+objects.</simpara>
+<simpara>git fsck --full --unreachable | cut -d ' ' -f3 | \
+git pack-redundant --all | xargs rm</simpara>
+</simplesect>
+<simplesect id="git-pack-redundant(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--all
+</term>
+<listitem>
+<simpara>
+        Processes all packs. Any filenames on the command line are ignored.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--alt-odb
+</term>
+<listitem>
+<simpara>
+        Don't require objects present in packs from alternate object
+        database (odb) directories to be present in local packs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        Outputs some statistics to stderr. Has a small performance penalty.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-pack-redundant(1)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="git-pack-objects(1)" />
+<xref linkend="git-repack(1)" />
+<xref linkend="git-prune-packed(1)" /></simpara>
+</simplesect>
+<simplesect id="git-pack-redundant(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

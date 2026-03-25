@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-verify-tag(1)">
+    <title>git-verify-tag(1)</title>
+<indexterm>
+<primary>git-verify-tag(1)</primary>
+</indexterm>
+<simplesect id="git-verify-tag(1)__name">
+<title>NAME</title>
+<simpara>git-verify-tag - Check the GPG signature of tags</simpara>
+</simplesect>
+<simplesect id="git-verify-tag(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><code>git</code> <code>verify-tag</code> [<code>-v</code> | <code>--verbose</code>] [<code>--format=</code><emphasis>&lt;format&gt;</emphasis>] [<code>--raw</code>] <emphasis>&lt;tag&gt;</emphasis><code>&#8230;</code></literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-verify-tag(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Validates the gpg signature created by <emphasis>git tag</emphasis> in the tag
+objects listed on the command line.</simpara>
+</simplesect>
+<simplesect id="git-verify-tag(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>--raw</emphasis>
+</term>
+<listitem>
+<simpara>
+        Print the raw gpg status output to standard error instead of the normal
+        human-readable output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-v</emphasis>
+</term>
+<term>
+<emphasis>--verbose</emphasis>
+</term>
+<listitem>
+<simpara>
+        Print the contents of the tag object before validating it.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-verify-tag(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

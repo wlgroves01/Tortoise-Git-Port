@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-var(1)">
+    <title>git-var(1)</title>
+<indexterm>
+<primary>git-var(1)</primary>
+</indexterm>
+<simplesect id="git-var(1)__name">
+<title>NAME</title>
+<simpara>git-var - Show a Git logical variable</simpara>
+</simplesect>
+<simplesect id="git-var(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><code>git</code> <code>var</code> (<code>-l</code> | <emphasis>&lt;variable&gt;</emphasis>)</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-var(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Prints a Git logical variable. Exits with code 1 if the variable has
+no value.</simpara>
+</simplesect>
+<simplesect id="git-var(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>-l</emphasis>
+</term>
+<listitem>
+<simpara>
+        Display the logical variables. In addition, all the
+        variables of the Git configuration file .git/config are listed
+        as well. (However, the configuration variables listing functionality
+        is deprecated in favor of <emphasis>git config -l</emphasis>.)
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-var(1)__examples">
+<title>EXAMPLES</title>
+<literallayout class="monospaced">$ git var GIT_AUTHOR_IDENT
+Eric W. Biederman &lt;ebiederm@lnxi.com&gt; 1121223278 -0600</literallayout>
+</simplesect>
+<simplesect id="git-var(1)__variables">
+<title>VARIABLES</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>GIT_AUTHOR_IDENT</emphasis>
+</term>
+<listitem>
+<simpara>
+    The author of a piece of code.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_COMMITTER_IDENT</emphasis>
+</term>
+<listitem>
+<simpara>
+    The person who put a piece of code into Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_EDITOR</emphasis>
+</term>
+<listitem>
+<simpara>
+    Text editor for use by Git commands.  The value is meant to be
+    interpreted by the shell when it is used.  Examples: <emphasis>~/bin/vi</emphasis>,
+    <emphasis>$SOME_ENVIRONMENT_VARIABLE</emphasis>, <emphasis>"C:\Program Files\Vim\gvim.exe"
+    --nofork</emphasis>.  The order of preference is <emphasis>$GIT_EDITOR</emphasis>, then
+    <emphasis>core.editor</emphasis> configuration value, then <emphasis>$VISUAL</emphasis>, then
+    <emphasis>$EDITOR</emphasis>, and then the default chosen at compile
+    time, which is usually <emphasis>vi</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_SEQUENCE_EDITOR</emphasis>
+</term>
+<listitem>
+<simpara>
+    Text editor used to edit the <emphasis>todo</emphasis> file while running <emphasis>git rebase
+    -i</emphasis>. Like <emphasis>GIT_EDITOR</emphasis>, the value is meant to be interpreted by
+    the shell when it is used. The order of preference is
+    <emphasis>$GIT_SEQUENCE_EDITOR</emphasis>, then <emphasis>sequence.editor</emphasis> configuration value,
+    and then the value of <emphasis>git var GIT_EDITOR</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_PAGER</emphasis>
+</term>
+<listitem>
+<simpara>
+    Text viewer for use by Git commands (e.g., <emphasis>less</emphasis>).  The value
+    is meant to be interpreted by the shell.  The order of preference
+    is <emphasis>$GIT_PAGER</emphasis>, then the value of <emphasis>core.pager</emphasis> configuration, then
+    <emphasis>$PAGER</emphasis>, and then the default chosen at compile time (usually <emphasis>less</emphasis>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_DEFAULT_BRANCH</emphasis>
+</term>
+<listitem>
+<simpara>
+    The name of the first branch created in newly initialized repositories.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_SHELL_PATH</emphasis>
+</term>
+<listitem>
+<simpara>
+    The path of the binary providing the POSIX shell for commands which use the shell.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_ATTR_SYSTEM</emphasis>
+</term>
+<listitem>
+<simpara>
+    The path to the system <xref linkend="gitattributes(5)" /> file, if one is enabled.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_ATTR_GLOBAL</emphasis>
+</term>
+<listitem>
+<simpara>
+    The path to the global (per-user) <xref linkend="gitattributes(5)" /> file.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_CONFIG_SYSTEM</emphasis>
+</term>
+<listitem>
+<simpara>
+    The path to the system configuration file, if one is enabled.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_CONFIG_GLOBAL</emphasis>
+</term>
+<listitem>
+<simpara>
+    The path to the global (per-user) configuration files, if any.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Most path values contain only one value. However, some can contain multiple
+values, which are separated by newlines, and are listed in order from highest to
+lowest priority.  Callers should be prepared for any such path value to contain
+multiple items.</simpara>
+<simpara>Note that paths are printed even if they do not exist, but not if they are
+disabled by other environment variables.</simpara>
+</simplesect>
+<simplesect id="git-var(1)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="git-commit-tree(1)" />
+<xref linkend="git-tag(1)" />
+<xref linkend="git-config(1)" /></simpara>
+</simplesect>
+<simplesect id="git-var(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

@@ -1,0 +1,699 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-stash(1)">
+    <title>git-stash(1)</title>
+<indexterm>
+<primary>git-stash(1)</primary>
+</indexterm>
+<simplesect id="git-stash(1)__name">
+<title>NAME</title>
+<simpara>git-stash - Stash the changes in a dirty working directory away</simpara>
+</simplesect>
+<simplesect id="git-stash(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><code>git</code> <code>stash</code> <code>list</code> [<emphasis>&lt;log-options&gt;</emphasis>]
+<code>git</code> <code>stash</code> <code>show</code> [<code>-u</code> | <code>--include-untracked</code> | <code>--only-untracked</code>] [<emphasis>&lt;diff-options&gt;</emphasis>] [<emphasis>&lt;stash&gt;</emphasis>]
+<code>git</code> <code>stash</code> <code>drop</code> [<code>-q</code> | <code>--quiet</code>] [<emphasis>&lt;stash&gt;</emphasis>]
+<code>git</code> <code>stash</code> <code>pop</code> [<code>--index</code>] [<code>-q</code> | <code>--quiet</code>] [<emphasis>&lt;stash&gt;</emphasis>]
+<code>git</code> <code>stash</code> <code>apply</code> [<code>--index</code>] [<code>-q</code> | <code>--quiet</code>] [<emphasis>&lt;stash&gt;</emphasis>]
+<code>git</code> <code>stash</code> <code>branch</code> <emphasis>&lt;branchname&gt;</emphasis> [<emphasis>&lt;stash&gt;</emphasis>]
+<code>git</code> <code>stash</code> [<code>push</code> [<code>-p</code> | <code>--patch</code>] [<code>-S</code> | <code>--staged</code>] [<code>-k</code> | <code>--</code>[<code>no-</code>]<code>keep-index</code>] [<code>-q</code> | <code>--quiet</code>]
+             [<code>-u</code> | <code>--include-untracked</code>] [<code>-a</code> | <code>--all</code>] [(<code>-m</code> | <code>--message</code>) <emphasis>&lt;message&gt;</emphasis>]
+             [<code>--pathspec-from-file=</code><emphasis>&lt;file&gt;</emphasis> [<code>--pathspec-file-nul</code>]]
+             [<code>--</code>] [<emphasis>&lt;pathspec&gt;</emphasis><code>&#8230;</code>]]
+<code>git</code> <code>stash</code> <code>save</code> [<code>-p</code> | <code>--patch</code>] [<code>-S</code> | <code>--staged</code>] [<code>-k</code> | <code>--</code>[<code>no-</code>]<code>keep-index</code>] [<code>-q</code> | <code>--quiet</code>]
+           [<code>-u</code> | <code>--include-untracked</code>] [<code>-a</code> | <code>--all</code>] [<emphasis>&lt;message&gt;</emphasis>]
+<code>git</code> <code>stash</code> <code>clear</code>
+<code>git</code> <code>stash</code> <code>create</code> [<emphasis>&lt;message&gt;</emphasis>]
+<code>git</code> <code>stash</code> <code>store</code> [(<code>-m</code> | <code>--message</code>) <emphasis>&lt;message&gt;</emphasis>] [<code>-q</code> | <code>--quiet</code>] <emphasis>&lt;commit&gt;</emphasis>
+<code>git</code> <code>stash</code> <code>export</code> (<code>--print</code> | <code>--to-ref</code> <emphasis>&lt;ref&gt;</emphasis>) [<emphasis>&lt;stash&gt;</emphasis><code>&#8230;</code>]
+<code>git</code> <code>stash</code> <code>import</code> <emphasis>&lt;commit&gt;</emphasis></literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-stash(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Use <emphasis>git stash</emphasis> when you want to record the current state of the
+working directory and the index, but want to go back to a clean
+working directory.  The command saves your local modifications away
+and reverts the working directory to match the <emphasis>HEAD</emphasis> commit.</simpara>
+<simpara>The modifications stashed away by this command can be listed with
+<emphasis>git stash list</emphasis>, inspected with <emphasis>git stash show</emphasis>, and restored
+(potentially on top of a different commit) with <emphasis>git stash apply</emphasis>.
+Calling <emphasis>git stash</emphasis> without any arguments is equivalent to <emphasis>git stash push</emphasis>.
+A stash is by default listed as "WIP on <emphasis>&lt;branchname&gt;</emphasis> &#8230;", but
+you can give a more descriptive message on the command line when
+you create one.</simpara>
+<simpara>The latest stash you created is stored in <emphasis>refs/stash</emphasis>; older
+stashes are found in the reflog of this reference and can be named using
+the usual reflog syntax (e.g. <emphasis>stash@{0}</emphasis> is the most recently
+created stash, <emphasis>stash@{1}</emphasis> is the one before it, <emphasis>stash@{2.hours.ago}</emphasis>
+is also possible). Stashes may also be referenced by specifying just the
+stash index (e.g. the integer <emphasis>&lt;n&gt;</emphasis> is equivalent to <emphasis>stash@{&lt;n&gt;}</emphasis>).</simpara>
+</simplesect>
+<simplesect id="git-stash(1)__commands">
+<title>COMMANDS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>push [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-u | --include-untracked] [ -a | --all] [-q | --quiet] [(-m|--message) &lt;message&gt;] [--pathspec-from-file=&lt;file&gt; [--pathspec-file-nul]] [--] [&lt;pathspec&gt;...]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Save your local modifications to a new <emphasis>stash entry</emphasis> and roll them
+        back to <emphasis>HEAD</emphasis> (in the working tree and in the index).
+        The <emphasis>&lt;message&gt;</emphasis> part is optional and gives
+        the description along with the stashed state.
+</simpara>
+<simpara>For quickly making a snapshot, you can omit "push".  In this mode,
+non-option arguments are not allowed to prevent a misspelled
+subcommand from making an unwanted stash entry.  The two exceptions to this
+are <emphasis>stash -p</emphasis> which acts as alias for <emphasis>stash push -p</emphasis> and pathspec elements,
+which are allowed after a double hyphen <emphasis>--</emphasis> for disambiguation.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>save [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-u | --include-untracked] [-a | --all] [-q | --quiet] [&lt;message&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is deprecated in favour of <emphasis>git stash push</emphasis>.  It
+        differs from "stash push" in that it cannot take pathspec.
+        Instead, all non-option arguments are concatenated to form the stash
+        message.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>list [&lt;log-options&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        List the stash entries that you currently have.  Each <emphasis>stash entry</emphasis> is
+        listed with its name (e.g. <emphasis>stash@{0}</emphasis> is the latest entry, <emphasis>stash@{1}</emphasis> is
+        the one before, etc.), the name of the branch that was current when the
+        entry was made, and a short description of the commit the entry was
+        based on.
+</simpara>
+<screen>stash@{0}: WIP on submit: 6ebd0e2... Update git-stash documentation
+stash@{1}: On master: 9cc0589... Add git-stash</screen>
+<simpara>The command takes options applicable to the <emphasis>git log</emphasis>
+command to control what is shown and how. See <xref linkend="git-log(1)" />.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>show [-u | --include-untracked | --only-untracked] [&lt;diff-options&gt;] [&lt;stash&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Show the changes recorded in the stash entry as a diff between the
+        stashed contents and the commit back when the stash entry was first
+        created.
+        By default, the command shows the diffstat, but it will accept any
+        format known to <emphasis>git diff</emphasis> (e.g., <emphasis>git stash show -p stash@{1}</emphasis>
+        to view the second most recent entry in patch form).
+        If no <emphasis>&lt;diff-option&gt;</emphasis> is provided, the default behavior will be given
+        by the <emphasis>stash.showStat</emphasis>, and <emphasis>stash.showPatch</emphasis> config variables. You
+        can also use <emphasis>stash.showIncludeUntracked</emphasis> to set whether
+        <emphasis>--include-untracked</emphasis> is enabled by default.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>pop [--index] [-q | --quiet] [&lt;stash&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Remove a single stashed state from the stash list and apply it
+        on top of the current working tree state, i.e., do the inverse
+        operation of <emphasis>git stash push</emphasis>. The working directory must
+        match the index.
+</simpara>
+<simpara>Applying the state can fail with conflicts; in this case, it is not
+removed from the stash list. You need to resolve the conflicts by hand
+and call <emphasis>git stash drop</emphasis> manually afterwards.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>apply [--index] [-q | --quiet] [&lt;stash&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Like <emphasis>pop</emphasis>, but do not remove the state from the stash list. Unlike <emphasis>pop</emphasis>,
+        <emphasis>&lt;stash&gt;</emphasis> may be any commit that looks like a commit created by
+        <emphasis>stash push</emphasis> or <emphasis>stash create</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>branch &lt;branchname&gt; [&lt;stash&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Creates and checks out a new branch named <emphasis>&lt;branchname&gt;</emphasis> starting from
+        the commit at which the <emphasis>&lt;stash&gt;</emphasis> was originally created, applies the
+        changes recorded in <emphasis>&lt;stash&gt;</emphasis> to the new working tree and index.
+        If that succeeds, and <emphasis>&lt;stash&gt;</emphasis> is a reference of the form
+        <emphasis>stash@{&lt;revision&gt;}</emphasis>, it then drops the <emphasis>&lt;stash&gt;</emphasis>.
+</simpara>
+<simpara>This is useful if the branch on which you ran <emphasis>git stash push</emphasis> has
+changed enough that <emphasis>git stash apply</emphasis> fails due to conflicts. Since
+the stash entry is applied on top of the commit that was HEAD at the
+time <emphasis>git stash</emphasis> was run, it restores the originally stashed state
+with no conflicts.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>clear</emphasis>
+</term>
+<listitem>
+<simpara>
+        Remove all the stash entries. Note that those entries will then
+        be subject to pruning, and may be impossible to recover (see
+        <emphasis>EXAMPLES</emphasis> below for a possible strategy).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>drop [-q | --quiet] [&lt;stash&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Remove a single stash entry from the list of stash entries.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>create</emphasis>
+</term>
+<listitem>
+<simpara>
+        Create a stash entry (which is a regular commit object) and
+        return its object name, without storing it anywhere in the ref
+        namespace.
+        This is intended to be useful for scripts.  It is probably not
+        the command you want to use; see "push" above.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>store</emphasis>
+</term>
+<listitem>
+<simpara>
+        Store a given stash created via <emphasis>git stash create</emphasis> (which is a
+        dangling merge commit) in the stash ref, updating the stash
+        reflog.  This is intended to be useful for scripts.  It is
+        probably not the command you want to use; see "push" above.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>export ( --print | --to-ref &lt;ref&gt; ) [&lt;stash&gt;...]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Export the specified stashes, or all of them if none are specified, to
+        a chain of commits which can be transferred using the normal fetch and
+        push mechanisms, then imported using the <emphasis>import</emphasis> subcommand.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>import &lt;commit&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Import the specified stashes from the specified commit, which must have been
+        created by <emphasis>export</emphasis>, and add them to the list of stashes.  To replace the
+        existing stashes, use <emphasis>clear</emphasis> first.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-stash(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>-a</emphasis>
+</term>
+<term>
+<emphasis>--all</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>push</emphasis> and <emphasis>save</emphasis> commands.
+</simpara>
+<simpara>All ignored and untracked files are also stashed and then cleaned
+up with <emphasis>git clean</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-u</emphasis>
+</term>
+<term>
+<emphasis>--include-untracked</emphasis>
+</term>
+<term>
+<emphasis>--no-include-untracked</emphasis>
+</term>
+<listitem>
+<simpara>
+        When used with the <emphasis>push</emphasis> and <emphasis>save</emphasis> commands,
+        all untracked files are also stashed and then cleaned up with
+        <emphasis>git clean</emphasis>.
+</simpara>
+<simpara>When used with the <emphasis>show</emphasis> command, show the untracked files in the stash
+entry as part of the diff.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--only-untracked</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for the <emphasis>show</emphasis> command.
+</simpara>
+<simpara>Show only the untracked files in the stash entry as part of the diff.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--index</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>pop</emphasis> and <emphasis>apply</emphasis> commands.
+</simpara>
+<simpara>Tries to reinstate not only the working tree's changes, but also
+the index's ones. However, this can fail, when you have conflicts
+(which are stored in the index, where you therefore can no longer
+apply the changes as they were originally).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-k</emphasis>
+</term>
+<term>
+<emphasis>--keep-index</emphasis>
+</term>
+<term>
+<emphasis>--no-keep-index</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>push</emphasis> and <emphasis>save</emphasis> commands.
+</simpara>
+<simpara>All changes already added to the index are left intact.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-p</emphasis>
+</term>
+<term>
+<emphasis>--patch</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>push</emphasis> and <emphasis>save</emphasis> commands.
+</simpara>
+<simpara>Interactively select hunks from the diff between HEAD and the
+working tree to be stashed.  The stash entry is constructed such
+that its index state is the same as the index state of your
+repository, and its worktree contains only the changes you selected
+interactively.  The selected changes are then rolled back from your
+worktree. See the Interactive Mode section of <xref linkend="git-add(1)" />
+to learn how to operate the <emphasis>--patch</emphasis> mode.</simpara>
+<simpara>The <emphasis>--patch</emphasis> option implies <emphasis>--keep-index</emphasis>.  You can use
+<emphasis>--no-keep-index</emphasis> to override this.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-U&lt;n&gt;</emphasis>
+</term>
+<term>
+<emphasis>--unified=&lt;n&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Generate diffs with <emphasis>&lt;n&gt;</emphasis> lines of context. Defaults to <emphasis>diff.context</emphasis>
+        or 3 if the config option is unset.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--inter-hunk-context=&lt;n&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Show the context between diff hunks, up to the specified <emphasis>&lt;number&gt;</emphasis>
+        of lines, thereby fusing hunks that are close to each other.
+        Defaults to <emphasis>diff.interHunkContext</emphasis> or 0 if the config option
+        is unset.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-S</emphasis>
+</term>
+<term>
+<emphasis>--staged</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>push</emphasis> and <emphasis>save</emphasis> commands.
+</simpara>
+<simpara>Stash only the changes that are currently staged. This is similar to
+basic <emphasis>git commit</emphasis> except the state is committed to the stash instead
+of current branch.</simpara>
+<simpara>The <emphasis>--patch</emphasis> option has priority over this one.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--pathspec-from-file=&lt;file&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>push</emphasis> command.
+</simpara>
+<simpara>Pathspec is passed in <emphasis>&lt;file&gt;</emphasis> instead of commandline args. If
+<emphasis>&lt;file&gt;</emphasis> is exactly <emphasis>-</emphasis> then standard input is used. Pathspec
+elements are separated by LF or CR/LF. Pathspec elements can be
+quoted as explained for the configuration variable <emphasis>core.quotePath</emphasis>
+(see <xref linkend="git-config(1)" />). See also <emphasis>--pathspec-file-nul</emphasis> and
+global <emphasis>--literal-pathspecs</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--pathspec-file-nul</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>push</emphasis> command.
+</simpara>
+<simpara>Only meaningful with <emphasis>--pathspec-from-file</emphasis>. Pathspec elements are
+separated with NUL character and all other characters are taken
+literally (including newlines and quotes).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-q</emphasis>
+</term>
+<term>
+<emphasis>--quiet</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>apply</emphasis>, <emphasis>drop</emphasis>, <emphasis>pop</emphasis>, <emphasis>push</emphasis>,
+        <emphasis>save</emphasis>, <emphasis>store</emphasis> commands.
+</simpara>
+<simpara>Quiet, suppress feedback messages.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--print</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for the <emphasis>export</emphasis> command.
+</simpara>
+<simpara>Create the chain of commits representing the exported stashes without
+storing it anywhere in the ref namespace and print the object ID to
+standard output.  This is designed for scripts.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--to-ref</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for the <emphasis>export</emphasis> command.
+</simpara>
+<simpara>Create the chain of commits representing the exported stashes and store
+it to the specified ref.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>push</emphasis> command.
+</simpara>
+<simpara>Separates pathspec from options for disambiguation purposes.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>&lt;pathspec&gt;...</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>push</emphasis> command.
+</simpara>
+<simpara>The new stash entry records the modified states only for the files
+that match the pathspec.  The index entries and working tree files
+are then rolled back to the state in HEAD only for these files,
+too, leaving files that do not match the pathspec intact.</simpara>
+<simpara>For more details, see the <emphasis>pathspec</emphasis> entry in <xref linkend="gitglossary(7)" />.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>&lt;stash&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        This option is only valid for <emphasis>apply</emphasis>, <emphasis>branch</emphasis>, <emphasis>drop</emphasis>, <emphasis>pop</emphasis>,
+        <emphasis>show</emphasis>, and <emphasis>export</emphasis> commands.
+</simpara>
+<simpara>A reference of the form <emphasis>stash@{&lt;revision&gt;}</emphasis>. When no <emphasis>&lt;stash&gt;</emphasis> is
+given, the latest stash is assumed (that is, <emphasis>stash@{0}</emphasis>).</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-stash(1)__discussion">
+<title>DISCUSSION</title>
+<simpara>A stash entry is represented as a commit whose tree records the state
+of the working directory, and its first parent is the commit at <emphasis>HEAD</emphasis>
+when the entry was created.  The tree of the second parent records the
+state of the index when the entry is made, and it is made a child of
+the <emphasis>HEAD</emphasis> commit.  The ancestry graph looks like this:</simpara>
+<literallayout class="monospaced">       .----W
+      /    /
+-----H----I</literallayout>
+<simpara>where <emphasis>H</emphasis> is the <emphasis>HEAD</emphasis> commit, <emphasis>I</emphasis> is a commit that records the state
+of the index, and <emphasis>W</emphasis> is a commit that records the state of the working
+tree.</simpara>
+</simplesect>
+<simplesect id="git-stash(1)__examples">
+<title>EXAMPLES</title>
+<variablelist>
+<varlistentry>
+<term>
+Pulling into a dirty tree
+</term>
+<listitem>
+<simpara>
+When you are in the middle of something, you learn that there are
+upstream changes that are possibly relevant to what you are
+doing.  When your local changes do not conflict with the changes in
+the upstream, a simple <emphasis>git pull</emphasis> will let you move forward.
+</simpara>
+<simpara>However, there are cases in which your local changes do conflict with
+the upstream changes, and <emphasis>git pull</emphasis> refuses to overwrite your
+changes.  In such a case, you can stash your changes away,
+perform a pull, and then unstash, like this:</simpara>
+<screen>$ git pull
+ ...
+file foobar not up to date, cannot merge.
+$ git stash
+$ git pull
+$ git stash pop</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Interrupted workflow
+</term>
+<listitem>
+<simpara>
+When you are in the middle of something, your boss comes in and
+demands that you fix something immediately.  Traditionally, you would
+make a commit to a temporary branch to store your changes away, and
+return to your original branch to make the emergency fix, like this:
+</simpara>
+<screen># ... hack hack hack ...
+$ git switch -c my_wip
+$ git commit -a -m "WIP"
+$ git switch master
+$ edit emergency fix
+$ git commit -a -m "Fix in a hurry"
+$ git switch my_wip
+$ git reset --soft HEAD^
+# ... continue hacking ...</screen>
+<simpara>You can use <emphasis>git stash</emphasis> to simplify the above, like this:</simpara>
+<screen># ... hack hack hack ...
+$ git stash
+$ edit emergency fix
+$ git commit -a -m "Fix in a hurry"
+$ git stash pop
+# ... continue hacking ...</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Testing partial commits
+</term>
+<listitem>
+<simpara>
+You can use <emphasis>git stash push --keep-index</emphasis> when you want to make two or
+more commits out of the changes in the work tree, and you want to test
+each change before committing:
+</simpara>
+<screen># ... hack hack hack ...
+$ git add --patch foo            # add just first part to the index
+$ git stash push --keep-index    # save all other changes to the stash
+$ edit/build/test first part
+$ git commit -m 'First part'     # commit fully tested change
+$ git stash pop                  # prepare to work on all other changes
+# ... repeat above five steps until one commit remains ...
+$ edit/build/test remaining parts
+$ git commit foo -m 'Remaining parts'</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Saving unrelated changes for future use
+</term>
+<listitem>
+<simpara>
+When you are in the middle of massive changes and you find some
+unrelated issue that you don't want to forget to fix, you can do the
+change(s), stage them, and use <emphasis>git stash push --staged</emphasis> to stash them
+out for future use. This is similar to committing the staged changes,
+only the commit ends-up being in the stash and not on the current branch.
+</simpara>
+<screen># ... hack hack hack ...
+$ git add --patch foo           # add unrelated changes to the index
+$ git stash push --staged       # save these changes to the stash
+# ... hack hack hack, finish current changes ...
+$ git commit -m 'Massive'       # commit fully tested changes
+$ git switch fixup-branch       # switch to another branch
+$ git stash pop                 # to finish work on the saved changes</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Recovering stash entries that were cleared/dropped erroneously
+</term>
+<listitem>
+<simpara>
+If you mistakenly drop or clear stash entries, they cannot be recovered
+through the normal safety mechanisms.  However, you can try the
+following incantation to get a list of stash entries that are still in
+your repository, but not reachable any more:
+</simpara>
+<screen>git fsck --unreachable |
+grep commit | cut -d\  -f3 |
+xargs git log --merges --no-walk --grep=WIP</screen>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-stash(1)__configuration">
+<title>CONFIGURATION</title>
+<simpara>Everything below this line in this section is selectively included
+from the <xref linkend="git-config(1)" /> documentation. The content is the same
+as what's found there:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>stash.index</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this is set to true, <emphasis>git stash apply</emphasis> and <emphasis>git stash pop</emphasis> will
+        behave as if <emphasis>--index</emphasis> was supplied. Defaults to false.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>stash.showIncludeUntracked</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this is set to true, the <emphasis>git stash show</emphasis> command will show
+        the untracked files of a stash entry. Defaults to false. 
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>stash.showPatch</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this is set to true, the <emphasis>git stash show</emphasis> command without an
+        option will show the stash entry in patch form.  Defaults to false.
+        
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>stash.showStat</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this is set to true, the <emphasis>git stash show</emphasis> command without an
+        option will show a diffstat of the stash entry.  Defaults to true.
+        
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-stash(1)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="git-checkout(1)" />,
+<xref linkend="git-commit(1)" />,
+<xref linkend="git-reflog(1)" />,
+<xref linkend="git-reset(1)" />,
+<xref linkend="git-switch(1)" /></simpara>
+</simplesect>
+<simplesect id="git-stash(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

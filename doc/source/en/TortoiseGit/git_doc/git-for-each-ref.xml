@@ -1,0 +1,960 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-for-each-ref(1)">
+    <title>git-for-each-ref(1)</title>
+<indexterm>
+<primary>git-for-each-ref(1)</primary>
+</indexterm>
+<simplesect id="git-for-each-ref(1)__name">
+<title>NAME</title>
+<simpara>git-for-each-ref - Output information on each ref</simpara>
+</simplesect>
+<simplesect id="git-for-each-ref(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><code>git</code> <code>for-each-ref</code> [<code>--count=</code><emphasis>&lt;count&gt;</emphasis>] [<code>--shell</code>|<code>--perl</code>|<code>--python</code>|<code>--tcl</code>]
+                   [(<code>--sort=</code><emphasis>&lt;key&gt;</emphasis>)<code>&#8230;</code>] [<code>--format=</code><emphasis>&lt;format&gt;</emphasis>]
+                   [<code>--include-root-refs</code>] [<code>--points-at=</code><emphasis>&lt;object&gt;</emphasis>]
+                   [<code>--merged</code>[<code>=</code><emphasis>&lt;object&gt;</emphasis>]] [<code>--no-merged</code>[<code>=</code><emphasis>&lt;object&gt;</emphasis>]]
+                   [<code>--contains</code>[<code>=</code><emphasis>&lt;object&gt;</emphasis>]] [<code>--no-contains</code>[<code>=</code><emphasis>&lt;object&gt;</emphasis>]]
+                   [(<code>--exclude=</code><emphasis>&lt;pattern&gt;</emphasis>)<code>&#8230;</code>] [<code>--start-after=</code><emphasis>&lt;marker&gt;</emphasis>]
+                   [ <code>--stdin</code> | (<emphasis>&lt;pattern&gt;</emphasis><code>&#8230;</code>)]</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-for-each-ref(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Iterate over all refs that match <emphasis>&lt;pattern&gt;</emphasis> and show them
+according to the given <emphasis>&lt;format&gt;</emphasis>, after sorting them according
+to the given set of <emphasis>&lt;key&gt;</emphasis>.  If <emphasis>&lt;count&gt;</emphasis> is given, stop after
+showing that many refs.  The interpolated values in <emphasis>&lt;format&gt;</emphasis>
+can optionally be quoted as string literals in the specified
+host language allowing their direct evaluation in that language.</simpara>
+</simplesect>
+<simplesect id="git-for-each-ref(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>&lt;pattern&gt;...</emphasis>
+</term>
+<listitem>
+<simpara>
+        If one or more <emphasis>&lt;pattern&gt;</emphasis> parameters are given, only refs are shown that
+        match against at least one pattern, either using <emphasis>fnmatch</emphasis>(3) or
+        literally, in the latter case matching completely or from the
+        beginning up to a slash.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--stdin</emphasis>
+</term>
+<listitem>
+<simpara>
+        The list of patterns is read from standard input instead of from
+        the argument list.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--count=&lt;count&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Stop after showing <emphasis>&lt;count&gt;</emphasis> refs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--sort=&lt;key&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Sort on the field name <emphasis>&lt;key&gt;</emphasis>.  Prefix <emphasis>-</emphasis> to sort in
+        descending order of the value.  When unspecified,
+        <emphasis>refname</emphasis> is used.  You may use the <emphasis>--sort=&lt;key&gt;</emphasis> option
+        multiple times, in which case the last key becomes the primary
+        key.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--format[=&lt;format&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        A string that interpolates <emphasis>%(fieldname)</emphasis> from a ref being shown and
+        the object it points at. In addition, the string literal <emphasis>%%</emphasis>
+        renders as <emphasis>%</emphasis> and <emphasis>%xx</emphasis> - where <emphasis>xx</emphasis> are hex digits - renders as
+        the character with hex code <emphasis>xx</emphasis>. For example, <emphasis>%00</emphasis> interpolates to
+        <emphasis>\0</emphasis> (<emphasis>NUL</emphasis>), <emphasis>%09</emphasis> to <emphasis>\t</emphasis> (<emphasis>TAB</emphasis>), and <emphasis>%0a</emphasis> to <emphasis>\n</emphasis> (<emphasis>LF</emphasis>).
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>When unspecified, <emphasis>&lt;format&gt;</emphasis> defaults to <emphasis>%(objectname) SPC %(objecttype)
+TAB %(refname)</emphasis>.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>--color[=&lt;when&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Respect any colors specified in the <emphasis>--format</emphasis> option. The
+        <emphasis>&lt;when_</emphasis> field must be one of <emphasis>always</emphasis>, <emphasis>never</emphasis>, or <emphasis>auto</emphasis> (if
+        <emphasis>&lt;when&gt;</emphasis> is absent, behave as if <emphasis>always</emphasis> was given).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--shell</emphasis>
+</term>
+<term>
+<emphasis>--perl</emphasis>
+</term>
+<term>
+<emphasis>--python</emphasis>
+</term>
+<term>
+<emphasis>--tcl</emphasis>
+</term>
+<listitem>
+<simpara>
+        If given, strings that substitute <emphasis>%(fieldname)</emphasis>
+        placeholders are quoted as string literals suitable for
+        the specified host language.  This is meant to produce
+        a scriptlet that can directly be "eval"ed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--points-at=&lt;object&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list refs which points at the given object.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--merged[=&lt;object&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list refs whose tips are reachable from the
+        specified commit (<emphasis>HEAD</emphasis> if not specified).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--no-merged[=&lt;object&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list refs whose tips are not reachable from <emphasis>&lt;object&gt;</emphasis>(<emphasis>HEAD</emphasis> if not
+        specified).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--contains[=&lt;object&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list refs which contain <emphasis>&lt;object&gt;</emphasis>(<emphasis>HEAD</emphasis> if not specified).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--no-contains[=&lt;object&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list refs which don't contain <emphasis>&lt;object&gt;</emphasis> (<emphasis>HEAD</emphasis>
+        if not specified).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--ignore-case</emphasis>
+</term>
+<listitem>
+<simpara>
+        Sorting and filtering refs are case insensitive.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--omit-empty</emphasis>
+</term>
+<listitem>
+<simpara>
+        Do not print a newline after formatted refs where the format expands
+        to the empty string.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--exclude=&lt;excluded-pattern&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        If one or more <emphasis>--exclude</emphasis> options are given, only refs which do not
+        match any <emphasis>&lt;excluded-pattern&gt;</emphasis> parameters are shown. Matching is done
+        using the same rules as <emphasis>&lt;pattern&gt;</emphasis> above.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--include-root-refs</emphasis>
+</term>
+<listitem>
+<simpara>
+        List root refs (<emphasis>HEAD</emphasis> and pseudorefs) apart from regular refs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--start-after=&lt;marker&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+    Allows paginating the output by skipping references up to and including the
+    specified marker. When paging, it should be noted that references may be
+    deleted, modified or added between invocations. Output will only yield those
+    references which follow the marker lexicographically. Output begins from the
+    first reference that would come after the marker alphabetically. Cannot be
+    used with <emphasis>--sort=&lt;key&gt;</emphasis> or <emphasis>--stdin</emphasis> options, or the <emphasis>&lt;pattern&gt;</emphasis> argument(s)
+    to limit the refs.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-for-each-ref(1)__field_names">
+<title>FIELD NAMES</title>
+<simpara>Various values from structured fields in referenced objects can
+be used to interpolate into the resulting output, or as sort
+keys.</simpara>
+<simpara>For all objects, the following names can be used:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>refname</emphasis>
+</term>
+<listitem>
+<simpara>
+        The name of the ref (the part after <emphasis>$GIT_DIR/</emphasis>).
+        For a non-ambiguous short name of the ref append <emphasis>:short</emphasis>.
+        The option <emphasis>core.warnAmbiguousRefs</emphasis> is used to select the strict
+        abbreviation mode. If <emphasis>lstrip=&lt;n&gt;</emphasis> (<emphasis>rstrip=&lt;n&gt;</emphasis>) is appended, strip <emphasis>&lt;n&gt;</emphasis>
+        slash-separated path components from the front (back) of the refname
+        (e.g. <emphasis>%(refname:lstrip=2)</emphasis> turns <emphasis>refs/tags/foo</emphasis> into <emphasis>foo</emphasis> and
+        <emphasis>%(refname:rstrip=2)</emphasis> turns <emphasis>refs/tags/foo</emphasis> into <emphasis>refs</emphasis>).
+        If <emphasis>&lt;n&gt;</emphasis> is a negative number, strip as many path components as
+        necessary from the specified end to leave <emphasis>-&lt;n&gt;</emphasis> path components
+        (e.g. <emphasis>%(refname:lstrip=-2)</emphasis> turns
+        <emphasis>refs/tags/foo</emphasis> into <emphasis>tags/foo</emphasis> and <emphasis>%(refname:rstrip=-1)</emphasis>
+        turns <emphasis>refs/tags/foo</emphasis> into <emphasis>refs</emphasis>). When the ref does not have
+        enough components, the result becomes an empty string if
+        stripping with positive <emphasis>&lt;n&gt;</emphasis>, or it becomes the full refname if
+        stripping with negative <emphasis>&lt;N&gt;</emphasis>.  Neither is an error.
+</simpara>
+<simpara><emphasis>strip</emphasis> can be used as a synonym to <emphasis>lstrip</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>objecttype</emphasis>
+</term>
+<listitem>
+<simpara>
+        The type of the object (<emphasis>blob</emphasis>, <emphasis>tree</emphasis>, <emphasis>commit</emphasis>, <emphasis>tag</emphasis>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>objectsize</emphasis>
+</term>
+<listitem>
+<simpara>
+        The size of the object (the same as <emphasis>git cat-file -s</emphasis> reports).
+        Append <emphasis>:disk</emphasis> to get the size, in bytes, that the object takes up on
+        disk. See the note about on-disk sizes in the <emphasis>CAVEATS</emphasis> section below.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>objectname</emphasis>
+</term>
+<listitem>
+<simpara>
+        The object name (aka SHA-1).
+        For a non-ambiguous abbreviation of the object name append <emphasis>:short</emphasis>.
+        For an abbreviation of the object name with desired length append
+        <emphasis>:short=&lt;length&gt;</emphasis>, where the minimum length is <emphasis>MINIMUM_ABBREV</emphasis>. The
+        length may be exceeded to ensure unique object names.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>deltabase</emphasis>
+</term>
+<listitem>
+<simpara>
+        This expands to the object name of the delta base for the
+        given object, if it is stored as a delta.  Otherwise it
+        expands to the null object name (all zeroes).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>upstream</emphasis>
+</term>
+<listitem>
+<simpara>
+        The name of a local ref which can be considered upstream
+        from the displayed ref. Respects <emphasis>:short</emphasis>, <emphasis>:lstrip</emphasis> and
+        <emphasis>:rstrip</emphasis> in the same way as <emphasis>refname</emphasis> above.  Additionally
+        respects <emphasis>:track</emphasis> to show "[ahead N, behind M]" and
+        <emphasis>:trackshort</emphasis> to show the terse version: "&gt;" (ahead), "&lt;"
+        (behind), "&lt;&gt;" (ahead and behind), or "=" (in sync). <emphasis>:track</emphasis>
+        also prints "[gone]" whenever unknown upstream ref is
+        encountered. Append <emphasis>:track,nobracket</emphasis> to show tracking
+        information without brackets (i.e "ahead N, behind M").
+</simpara>
+<simpara>For any remote-tracking branch <emphasis>%(upstream)</emphasis>, <emphasis>%(upstream:remotename)</emphasis>
+and <emphasis>%(upstream:remoteref)</emphasis> refer to the name of the remote and the
+name of the tracked remote ref, respectively. In other words, the
+remote-tracking branch can be updated explicitly and individually by
+using the refspec <emphasis>%(upstream:remoteref):%(upstream)</emphasis> to fetch from
+<emphasis>%(upstream:remotename)</emphasis>.</simpara>
+<simpara>Has no effect if the ref does not have tracking information associated
+with it.  All the options apart from <emphasis>nobracket</emphasis> are mutually exclusive,
+but if used together the last option is selected.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>push</emphasis>
+</term>
+<listitem>
+<simpara>
+        The name of a local ref which represents the <emphasis>@{push}</emphasis>
+        location for the displayed ref. Respects <emphasis>:short</emphasis>, <emphasis>:lstrip</emphasis>,
+        <emphasis>:rstrip</emphasis>, <emphasis>:track</emphasis>, <emphasis>:trackshort</emphasis>, <emphasis>:remotename</emphasis>, and <emphasis>:remoteref</emphasis>
+        options as <emphasis>upstream</emphasis> does. Produces an empty string if no <emphasis>@{push}</emphasis>
+        ref is configured.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>HEAD</emphasis>
+</term>
+<listitem>
+<simpara>
+        <emphasis>*</emphasis> if <emphasis>HEAD</emphasis> matches current ref (the checked out branch), ' '
+        otherwise.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>color</emphasis>
+</term>
+<listitem>
+<simpara>
+        Change output color. Followed by <emphasis>:&lt;colorname&gt;</emphasis>, where color
+        names are described under Values in the "CONFIGURATION FILE"
+        section of <xref linkend="git-config(1)" />.  For example,
+        <emphasis>%(color:bold red)</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>align</emphasis>
+</term>
+<listitem>
+<simpara>
+        Left-, middle-, or right-align the content between
+        <emphasis>%(align:...)</emphasis> and <emphasis>%(end)</emphasis>. The "<emphasis>align:</emphasis>" is followed by
+        <emphasis>width=&lt;width&gt;</emphasis> and <emphasis>position=&lt;position&gt;</emphasis> in any order
+        separated by a comma, where the <emphasis>&lt;position&gt;</emphasis> is either <emphasis>left</emphasis>,
+        <emphasis>right</emphasis> or <emphasis>middle</emphasis>, default being <emphasis>left</emphasis> and <emphasis>&lt;width&gt;</emphasis> is the total
+        length of the content with alignment. For brevity, the
+        "width=" and/or "position=" prefixes may be omitted, and bare
+        <emphasis>&lt;width&gt;</emphasis> and <emphasis>&lt;position&gt;</emphasis> used instead.  For instance,
+        <emphasis>%(align:&lt;width&gt;,&lt;position&gt;)</emphasis>. If the contents length is more
+        than the width then no alignment is performed. If used with
+        <emphasis>--quote</emphasis> everything in between <emphasis>%(align:...)</emphasis> and <emphasis>%(end)</emphasis> is
+        quoted, but if nested then only the topmost level performs
+        quoting.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>if</emphasis>
+</term>
+<listitem>
+<simpara>
+        Used as <emphasis>%(if)...%(then)...%(end)</emphasis> or
+        <emphasis>%(if)...%(then)...%(else)...%(end)</emphasis>.  If there is an atom with
+        value or string literal after the <emphasis>%(if)</emphasis> then everything after
+        the <emphasis>%(then)</emphasis> is printed, else if the <emphasis>%(else)</emphasis> atom is used, then
+        everything after %(else) is printed. We ignore space when
+        evaluating the string before <emphasis>%(then)</emphasis>, this is useful when we
+        use the <emphasis>%(HEAD)</emphasis> atom which prints either "<emphasis>*</emphasis>" or " " and we
+        want to apply the <emphasis>if</emphasis> condition only on the <emphasis>HEAD</emphasis> ref.
+        Append "<emphasis>:equals=&lt;string&gt;</emphasis>" or "<emphasis>:notequals=&lt;string&gt;</emphasis>" to compare
+        the value between the <emphasis>%(if:...)</emphasis> and <emphasis>%(then)</emphasis> atoms with the
+        given string.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>symref</emphasis>
+</term>
+<listitem>
+<simpara>
+        The ref which the given symbolic ref refers to. If not a
+        symbolic ref, nothing is printed. Respects the <emphasis>:short</emphasis>,
+        <emphasis>:lstrip</emphasis> and <emphasis>:rstrip</emphasis> options in the same way as <emphasis>refname</emphasis>
+        above.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>signature</emphasis>
+</term>
+<listitem>
+<simpara>
+        The GPG signature of a commit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>signature:grade</emphasis>
+</term>
+<listitem>
+<simpara>
+        Show
+</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>G</emphasis>
+</term>
+<listitem>
+<simpara>
+for a good (valid) signature
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>B</emphasis>
+</term>
+<listitem>
+<simpara>
+for a bad signature
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>U</emphasis>
+</term>
+<listitem>
+<simpara>
+for a good signature with unknown validity
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>X</emphasis>
+</term>
+<listitem>
+<simpara>
+for a good signature that has expired
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>Y</emphasis>
+</term>
+<listitem>
+<simpara>
+for a good signature made by an expired key
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>R</emphasis>
+</term>
+<listitem>
+<simpara>
+for a good signature made by a revoked key
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>E</emphasis>
+</term>
+<listitem>
+<simpara>
+if the signature cannot be checked (e.g. missing key)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>N</emphasis>
+</term>
+<listitem>
+<simpara>
+for no signature.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>signature:signer</emphasis>
+</term>
+<listitem>
+<simpara>
+        The signer of the GPG signature of a commit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>signature:key</emphasis>
+</term>
+<listitem>
+<simpara>
+        The key of the GPG signature of a commit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>signature:fingerprint</emphasis>
+</term>
+<listitem>
+<simpara>
+        The fingerprint of the GPG signature of a commit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>signature:primarykeyfingerprint</emphasis>
+</term>
+<listitem>
+<simpara>
+        The primary key fingerprint of the GPG signature of a commit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>signature:trustlevel</emphasis>
+</term>
+<listitem>
+<simpara>
+        The trust level of the GPG signature of a commit. Possible
+        outputs are <emphasis>ultimate</emphasis>, <emphasis>fully</emphasis>, <emphasis>marginal</emphasis>, <emphasis>never</emphasis> and <emphasis>undefined</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>worktreepath</emphasis>
+</term>
+<listitem>
+<simpara>
+        The absolute path to the worktree in which the ref is checked
+        out, if it is checked out in any linked worktree. Empty string
+        otherwise.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>ahead-behind:&lt;commit-ish&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Two integers, separated by a space, demonstrating the number of
+        commits ahead and behind, respectively, when comparing the output
+        ref to the <emphasis>&lt;committish&gt;</emphasis> specified in the format.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>is-base:&lt;commit-ish&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        In at most one row, <emphasis>(&lt;commit-ish&gt;)</emphasis> will appear to indicate the ref
+        that is most likely the ref used as a starting point for the branch
+        that produced <emphasis>&lt;commit-ish&gt;</emphasis>. This choice is made using a heuristic:
+        choose the ref that minimizes the number of commits in the
+        first-parent history of <emphasis>&lt;commit-ish&gt;</emphasis> and not in the first-parent
+        history of the ref.
+</simpara>
+<simpara>For example, consider the following figure of first-parent histories of
+several refs:</simpara>
+<screen>*--*--*--*--*--* refs/heads/A
+\
+ \
+  *--*--*--* refs/heads/B
+   \     \
+    \     \
+     *     * refs/heads/C
+      \
+       \
+        *--* refs/heads/D</screen>
+<simpara>Here, if <emphasis>A</emphasis>, <emphasis>B</emphasis>, and <emphasis>C</emphasis> are the filtered references, and the format
+string is <emphasis>%(refname):%(is-base:D)</emphasis>, then the output would be</simpara>
+<screen>refs/heads/A:
+refs/heads/B:(D)
+refs/heads/C:</screen>
+<simpara>This is because the first-parent history of <emphasis>D</emphasis> has its earliest
+intersection with the first-parent histories of the filtered refs at a
+common first-parent ancestor of <emphasis>B</emphasis> and <emphasis>C</emphasis> and ties are broken by the
+earliest ref in the sorted order.</simpara>
+<simpara>Note that this token will not appear if the first-parent history of
+<emphasis>&lt;commit-ish&gt;</emphasis> does not intersect the first-parent histories of the
+filtered refs.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>describe[:&lt;option&gt;,...]</emphasis>
+</term>
+<listitem>
+<simpara>
+        A human-readable name, like <xref linkend="git-describe(1)" />;
+        empty string for undescribable commits. The <emphasis>describe</emphasis> string may
+        be followed by a colon and one or more comma-separated options.
+</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>tags=&lt;bool-value&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Instead of only considering annotated tags, consider
+        lightweight tags as well; see the corresponding option in
+        <xref linkend="git-describe(1)" /> for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>abbrev=&lt;number&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Use at least <emphasis>&lt;number&gt;</emphasis> hexadecimal digits; see the corresponding
+        option in <xref linkend="git-describe(1)" /> for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>match=&lt;pattern&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only consider tags matching the <emphasis>glob</emphasis>(7) <emphasis>&lt;pattern&gt;</emphasis>,
+        excluding the <emphasis>refs/tags/</emphasis> prefix; see the corresponding option
+        in <xref linkend="git-describe(1)" /> for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>exclude=&lt;pattern&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Do not consider tags matching the <emphasis>glob</emphasis>(7) <emphasis>&lt;pattern&gt;</emphasis>,
+        excluding the <emphasis>refs/tags/</emphasis> prefix; see the corresponding option
+        in <xref linkend="git-describe(1)" /> for details.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>In addition to the above, for commit and tag objects, the header
+field names (<emphasis>tree</emphasis>, <emphasis>parent</emphasis>, <emphasis>object</emphasis>, <emphasis>type</emphasis>, and <emphasis>tag</emphasis>) can
+be used to specify the value in the header field.
+Fields <emphasis>tree</emphasis> and <emphasis>parent</emphasis> can also be used with modifier <emphasis>:short</emphasis> and
+<emphasis>:short=&lt;length&gt;</emphasis> just like <emphasis>objectname</emphasis>.</simpara>
+<simpara>For commit and tag objects, the special <emphasis>creatordate</emphasis> and <emphasis>creator</emphasis>
+fields will correspond to the appropriate date or name-email-date tuple
+from the <emphasis>committer</emphasis> or <emphasis>tagger</emphasis> fields depending on the object type.
+These are intended for working on a mix of annotated and lightweight tags.</simpara>
+<simpara>For tag objects, a <emphasis>fieldname</emphasis> prefixed with an asterisk (<emphasis>*</emphasis>) expands to
+the <emphasis>fieldname</emphasis> value of the peeled object, rather than that of the tag
+object itself.</simpara>
+<simpara>Fields that have name-email-date tuple as its value (<emphasis>author</emphasis>,
+<emphasis>committer</emphasis>, and <emphasis>tagger</emphasis>) can be suffixed with <emphasis>name</emphasis>, <emphasis>email</emphasis>,
+and <emphasis>date</emphasis> to extract the named component.  For email fields (<emphasis>authoremail</emphasis>,
+<emphasis>committeremail</emphasis> and <emphasis>taggeremail</emphasis>), <emphasis>:trim</emphasis> can be appended to get the email
+without angle brackets, and <emphasis>:localpart</emphasis> to get the part before the <emphasis>@</emphasis> symbol
+out of the trimmed email. In addition to these, the <emphasis>:mailmap</emphasis> option and the
+corresponding <emphasis>:mailmap,trim</emphasis> and <emphasis>:mailmap,localpart</emphasis> can be used (order does
+not matter) to get values of the name and email according to the .mailmap file
+or according to the file set in the mailmap.file or mailmap.blob configuration
+variable (see <xref linkend="gitmailmap(5)" />).</simpara>
+<simpara>The raw data in an object is <emphasis>raw</emphasis>.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>raw:size</emphasis>
+</term>
+<listitem>
+<simpara>
+        The raw data size of the object.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Note that <emphasis>--format=%(raw)</emphasis> can not be used with <emphasis>--python</emphasis>, <emphasis>--shell</emphasis>, <emphasis>--tcl</emphasis>,
+because such language may not support arbitrary binary data in their string
+variable type.</simpara>
+<simpara>The message in a commit or a tag object is <emphasis>contents</emphasis>, from which
+<emphasis>contents:&lt;part&gt;</emphasis> can be used to extract various parts out of:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>contents:size</emphasis>
+</term>
+<listitem>
+<simpara>
+        The size in bytes of the commit or tag message.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>contents:subject</emphasis>
+</term>
+<listitem>
+<simpara>
+        The first paragraph of the message, which typically is a
+        single line, is taken as the "subject" of the commit or the
+        tag message.
+        Instead of <emphasis>contents:subject</emphasis>, field <emphasis>subject</emphasis> can also be used to
+        obtain same results. <emphasis>:sanitize</emphasis> can be appended to <emphasis>subject</emphasis> for
+        subject line suitable for filename.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>contents:body</emphasis>
+</term>
+<listitem>
+<simpara>
+        The remainder of the commit or the tag message that follows
+        the "subject".
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>contents:signature</emphasis>
+</term>
+<listitem>
+<simpara>
+        The optional GPG signature of the tag.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>contents:lines=&lt;n&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        The first <emphasis>&lt;n&gt;</emphasis> lines of the message.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Additionally, the trailers as interpreted by <xref linkend="git-interpret-trailers(1)" />
+are obtained as <emphasis>trailers[:&lt;option&gt;,...]</emphasis> (or by using the historical alias
+<emphasis>contents:trailers[:&lt;option&gt;,...]</emphasis>). For valid <emphasis>&lt;option&gt;</emphasis> values see <emphasis>trailers</emphasis>
+section of <xref linkend="git-log(1)" />.</simpara>
+<simpara>For sorting purposes, fields with numeric values sort in numeric order
+(<emphasis>objectsize</emphasis>, <emphasis>authordate</emphasis>, <emphasis>committerdate</emphasis>, <emphasis>creatordate</emphasis>, <emphasis>taggerdate</emphasis>).
+All other fields are used to sort in their byte-value order.</simpara>
+<simpara>There is also an option to sort by versions, this can be done by using
+the fieldname <emphasis>version:refname</emphasis> or its alias <emphasis>v:refname</emphasis>.</simpara>
+<simpara>In any case, a field name that refers to a field inapplicable to
+the object referred by the ref does not cause an error.  It
+returns an empty string instead.</simpara>
+<simpara>As a special case for the date-type fields, you may specify a format for the
+date by adding <emphasis>:</emphasis> followed by date format name (see the values the <emphasis>--date</emphasis>
+option to <xref linkend="git-rev-list(1)" /> takes). If this formatting is provided in
+a <emphasis>--sort</emphasis> key, references will be sorted according to the byte-value of the
+formatted string rather than the numeric value of the underlying timestamp.</simpara>
+<simpara>Some atoms like <emphasis>%(align)</emphasis> and <emphasis>%(if)</emphasis> always require a matching <emphasis>%(end)</emphasis>.
+We call them "opening atoms" and sometimes denote them as <emphasis>%($open)</emphasis>.</simpara>
+<simpara>When a scripting language specific quoting is in effect, everything
+between a top-level opening atom and its matching %(end) is evaluated
+according to the semantics of the opening atom and only its result
+from the top-level is quoted.</simpara>
+</simplesect>
+<simplesect id="git-for-each-ref(1)__examples">
+<title>EXAMPLES</title>
+<simpara>An example directly producing formatted text.  Show the most recent
+3 tagged commits:</simpara>
+<screen>#!/bin/sh
+
+git for-each-ref --count=3 --sort='-*authordate' \
+`--format='From: %(*authorname) %(*authoremail)
+Subject: %(*subject)
+Date: %(*authordate)
+Ref: %(*refname)
+
+%(*body)
+' 'refs/tags'</screen>
+<simpara>A simple example showing the use of shell eval on the output,
+demonstrating the use of <emphasis>--shell</emphasis>.  List the prefixes of all heads:</simpara>
+<screen>#!/bin/sh
+
+git for-each-ref --shell --format="ref=%(refname)" refs/heads | \
+while read entry
+do
+        eval "$entry"
+        echo `dirname $ref`
+done</screen>
+<simpara>A bit more elaborate report on tags, demonstrating that the format
+may be an entire script:</simpara>
+<screen>#!/bin/sh
+
+fmt='
+        r=%(refname)
+        t=%(*objecttype)
+        T=${r#refs/tags/}
+
+        o=%(*objectname)
+        n=%(*authorname)
+        e=%(*authoremail)
+        s=%(*subject)
+        d=%(*authordate)
+        b=%(*body)
+
+        kind=Tag
+        if test "z$t" = z
+        then
+                # could be a lightweight tag
+                t=%(objecttype)
+                kind="Lightweight tag"
+                o=%(objectname)
+                n=%(authorname)
+                e=%(authoremail)
+                s=%(subject)
+                d=%(authordate)
+                b=%(body)
+        fi
+        echo "$kind $T points at a $t object $o"
+        if test "z$t" = zcommit
+        then
+                echo "The commit was authored by $n $e
+at $d, and titled
+
+    $s
+
+Its message reads as:
+"
+                echo "$b" | sed -e "s/^/    /"
+                echo
+        fi
+'
+
+eval=`git for-each-ref --shell --format="$fmt" \
+        --sort='*objecttype' \
+        --sort=-taggerdate \
+        refs/tags`
+eval "$eval"</screen>
+<simpara>An example to show the usage of <emphasis>%(if)...%(then)...%(else)...%(end)</emphasis>.
+This prefixes the current branch with a star.</simpara>
+<screen>git for-each-ref --format="%(if)%(HEAD)%(then)* %(else)  %(end)%(refname:short)" refs/heads/</screen>
+<simpara>An example to show the usage of <emphasis>%(if)...%(then)...%(end)</emphasis>.
+This prints the authorname, if present.</simpara>
+<screen>git for-each-ref --format="%(refname)%(if)%(authorname)%(then) Authored by: %(authorname)%(end)"</screen>
+</simplesect>
+<simplesect id="git-for-each-ref(1)__caveats">
+<title>CAVEATS</title>
+<simpara>Note that the sizes of objects on disk are reported accurately, but care
+should be taken in drawing conclusions about which refs or objects are
+responsible for disk usage. The size of a packed non-delta object may be
+much larger than the size of objects which delta against it, but the
+choice of which object is the base and which is the delta is arbitrary
+and is subject to change during a repack.</simpara>
+<simpara>Note also that multiple copies of an object may be present in the object
+database; in this case, it is undefined which copy's size or delta base
+will be reported.</simpara>
+</simplesect>
+<simplesect id="git-for-each-ref(1)__notes">
+<title>NOTES</title>
+<simpara>When combining multiple <emphasis>--contains</emphasis> and <emphasis>--no-contains</emphasis> filters, only
+references that contain at least one of the <emphasis>--contains</emphasis> commits and
+contain none of the <emphasis>--no-contains</emphasis> commits are shown.</simpara>
+<simpara>When combining multiple <emphasis>--merged</emphasis> and <emphasis>--no-merged</emphasis> filters, only
+references that are reachable from at least one of the <emphasis>--merged</emphasis>
+commits and from none of the <emphasis>--no-merged</emphasis> commits are shown.</simpara>
+</simplesect>
+<simplesect id="git-for-each-ref(1)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="git-show-ref(1)" /></simpara>
+</simplesect>
+<simplesect id="git-for-each-ref(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-commit-graph(1)">
+    <title>git-commit-graph(1)</title>
+<indexterm>
+<primary>git-commit-graph(1)</primary>
+</indexterm>
+<simplesect id="git-commit-graph(1)__name">
+<title>NAME</title>
+<simpara>git-commit-graph - Write and verify Git commit-graph files</simpara>
+</simplesect>
+<simplesect id="git-commit-graph(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><emphasis>git commit-graph verify</emphasis> [--object-dir &lt;dir&gt;] [--shallow] [--[no-]progress]
+<emphasis>git commit-graph write</emphasis> [--object-dir &lt;dir&gt;] [--append]
+                        [--split[=&lt;strategy&gt;]] [--reachable | --stdin-packs | --stdin-commits]
+                        [--changed-paths] [--[no-]max-new-filters &lt;n&gt;] [--[no-]progress]
+                        &lt;split-options&gt;</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-commit-graph(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Manage the serialized commit-graph file.</simpara>
+</simplesect>
+<simplesect id="git-commit-graph(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--object-dir
+</term>
+<listitem>
+<simpara>
+        Use given directory for the location of packfiles and commit-graph
+        file. This parameter exists to specify the location of an alternate
+        that only has the objects directory, not a full <emphasis>.git</emphasis> directory. The
+        commit-graph file is expected to be in the <emphasis>&lt;dir&gt;/info</emphasis> directory and
+        the packfiles are expected to be in <emphasis>&lt;dir&gt;/pack</emphasis>. If the directory
+        could not be made into an absolute path, or does not match any known
+        object directory, <emphasis>git commit-graph ...</emphasis> will exit with non-zero
+        status.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--progress
+</term>
+<term>
+--no-progress
+</term>
+<listitem>
+<simpara>
+        Turn progress on/off explicitly. If neither is specified, progress is
+        shown if standard error is connected to a terminal.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-commit-graph(1)__commands">
+<title>COMMANDS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>write</emphasis>
+</term>
+<listitem>
+<simpara>
+Write a commit-graph file based on the commits found in packfiles. If
+the config option <emphasis>core.commitGraph</emphasis> is disabled, then this command will
+output a warning, then return success without writing a commit-graph file.
+</simpara>
+<simpara>With the <emphasis>--stdin-packs</emphasis> option, generate the new commit graph by
+walking objects only in the specified pack-indexes. (Cannot be combined
+with <emphasis>--stdin-commits</emphasis> or <emphasis>--reachable</emphasis>.)</simpara>
+<simpara>With the <emphasis>--stdin-commits</emphasis> option, generate the new commit graph by
+walking commits starting at the commits specified in stdin as a list
+of OIDs in hex, one OID per line. OIDs that resolve to non-commits
+(either directly, or by peeling tags) are silently ignored. OIDs that
+are malformed, or do not exist generate an error. (Cannot be combined
+with <emphasis>--stdin-packs</emphasis> or <emphasis>--reachable</emphasis>.)</simpara>
+<simpara>With the <emphasis>--reachable</emphasis> option, generate the new commit graph by walking
+commits starting at all refs. (Cannot be combined with <emphasis>--stdin-commits</emphasis>
+or <emphasis>--stdin-packs</emphasis>.)</simpara>
+<simpara>With the <emphasis>--append</emphasis> option, include all commits that are present in the
+existing commit-graph file.</simpara>
+<simpara>With the <emphasis>--changed-paths</emphasis> option, compute and write information about the
+paths changed between a commit and its first parent. This operation can
+take a while on large repositories. It provides significant performance gains
+for getting history of a directory or a file with <emphasis>git log -- &lt;path&gt;</emphasis>. If
+this option is given, future commit-graph writes will automatically assume
+that this option was intended. Use <emphasis>--no-changed-paths</emphasis> to stop storing this
+data. <emphasis>--changed-paths</emphasis> is implied by config <emphasis>commitGraph.changedPaths=true</emphasis>.</simpara>
+<simpara>With the <emphasis>--max-new-filters=&lt;n&gt;</emphasis> option, generate at most <emphasis>n</emphasis> new Bloom
+filters (if <emphasis>--changed-paths</emphasis> is specified). If <emphasis>n</emphasis> is <emphasis>-1</emphasis>, no limit is
+enforced. Only commits present in the new layer count against this
+limit. To retroactively compute Bloom filters over earlier layers, it is
+advised to use <emphasis>--split=replace</emphasis>.  Overrides the <emphasis>commitGraph.maxNewFilters</emphasis>
+configuration.</simpara>
+<simpara>With the <emphasis>--split[=&lt;strategy&gt;]</emphasis> option, write the commit-graph as a
+chain of multiple commit-graph files stored in
+<emphasis>&lt;dir&gt;/info/commit-graphs</emphasis>. Commit-graph layers are merged based on the
+strategy and other splitting options. The new commits not already in the
+commit-graph are added in a new "tip" file. This file is merged with the
+existing file if the following merge conditions are met:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+If <emphasis>--split=no-merge</emphasis> is specified, a merge is never performed, and
+the remaining options are ignored. <emphasis>--split=replace</emphasis> overwrites the
+existing chain with a new one. A bare <emphasis>--split</emphasis> defers to the remaining
+options. (Note that merging a chain of commit graphs replaces the
+existing chain with a length-1 chain where the first and only
+incremental holds the entire graph).
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+If <emphasis>--size-multiple=&lt;X&gt;</emphasis> is not specified, let <emphasis>X</emphasis> equal 2. If the new
+tip file would have <emphasis>N</emphasis> commits and the previous tip has <emphasis>M</emphasis> commits and
+<emphasis>X</emphasis> times <emphasis>N</emphasis> is greater than  <emphasis>M</emphasis>, instead merge the two files into a
+single file.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+If <emphasis>--max-commits=&lt;M&gt;</emphasis> is specified with <emphasis>M</emphasis> a positive integer, and the
+new tip file would have more than <emphasis>M</emphasis> commits, then instead merge the new
+tip with the previous tip.
+</simpara>
+<simpara>Finally, if <emphasis>--expire-time=&lt;datetime&gt;</emphasis> is not specified, let <emphasis>datetime</emphasis>
+be the current time. After writing the split commit-graph, delete all
+unused commit-graph whose modified times are older than <emphasis>datetime</emphasis>.</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>verify</emphasis>
+</term>
+<listitem>
+<simpara>
+Read the commit-graph file and verify its contents against the object
+database. Used to check for corrupted data.
+</simpara>
+<simpara>With the <emphasis>--shallow</emphasis> option, only check the tip commit-graph file in
+a chain of split commit-graphs.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-commit-graph(1)__examples">
+<title>EXAMPLES</title>
+<itemizedlist>
+<listitem>
+<simpara>
+Write a commit-graph file for the packed commits in your local <emphasis>.git</emphasis>
+  directory.
+</simpara>
+<screen>$ git commit-graph write</screen>
+</listitem>
+<listitem>
+<simpara>
+Write a commit-graph file, extending the current commit-graph file
+  using commits in <emphasis>&lt;pack-index&gt;</emphasis>.
+</simpara>
+<screen>$ echo &lt;pack-index&gt; | git commit-graph write --stdin-packs</screen>
+</listitem>
+<listitem>
+<simpara>
+Write a commit-graph file containing all reachable commits.
+</simpara>
+<screen>$ git show-ref -s | git commit-graph write --stdin-commits</screen>
+</listitem>
+<listitem>
+<simpara>
+Write a commit-graph file containing all commits in the current
+  commit-graph file along with those reachable from <emphasis>HEAD</emphasis>.
+</simpara>
+<screen>$ git rev-parse HEAD | git commit-graph write --stdin-commits --append</screen>
+</listitem>
+</itemizedlist>
+</simplesect>
+<simplesect id="git-commit-graph(1)__configuration">
+<title>CONFIGURATION</title>
+<simpara>Everything below this line in this section is selectively included
+from the <xref linkend="git-config(1)" /> documentation. The content is the same
+as what's found there:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+commitGraph.generationVersion
+</term>
+<listitem>
+<simpara>
+        Specifies the type of generation number version to use when writing
+        or reading the commit-graph file. If version 1 is specified, then
+        the corrected commit dates will not be written or read. Defaults to
+        2.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+commitGraph.maxNewFilters
+</term>
+<listitem>
+<simpara>
+        Specifies the default value for the <emphasis>--max-new-filters</emphasis> option of <emphasis>git
+        commit-graph write</emphasis> (c.f., <xref linkend="git-commit-graph(1)" />).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+commitGraph.changedPaths
+</term>
+<listitem>
+<simpara>
+        If true, then <emphasis>git commit-graph write</emphasis> will compute and write
+        changed-path Bloom filters by default, equivalent to passing
+        <emphasis>--changed-paths</emphasis>. If false or unset, changed-paths Bloom filters will
+        be written during <emphasis>git commit-graph write</emphasis> only if the filters already
+        exist in the current commit-graph file. This matches the default
+        behavior of <emphasis>git commit-graph write</emphasis> without any <emphasis>--[no-]changed-paths</emphasis>
+        option. To rewrite a commit-graph file without any filters, use the
+        <emphasis>--no-changed-paths</emphasis> option. Command-line option <emphasis>--[no-]changed-paths</emphasis>
+        always takes precedence over this configuration. Defaults to unset.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+commitGraph.readChangedPaths
+</term>
+<listitem>
+<simpara>
+        Deprecated. Equivalent to commitGraph.changedPathsVersion=-1 if true, and
+        commitGraph.changedPathsVersion=0 if false. (If commitGraph.changedPathVersion
+        is also set, commitGraph.changedPathsVersion takes precedence.)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+commitGraph.changedPathsVersion
+</term>
+<listitem>
+<simpara>
+        Specifies the version of the changed-path Bloom filters that Git will read and
+        write. May be -1, 0, 1, or 2. Note that values greater than 1 may be
+        incompatible with older versions of Git which do not yet understand
+        those versions. Use caution when operating in a mixed-version
+        environment.
+</simpara>
+<simpara>Defaults to -1.</simpara>
+<simpara>If -1, Git will use the version of the changed-path Bloom filters in the
+repository, defaulting to 1 if there are none.</simpara>
+<simpara>If 0, Git will not read any Bloom filters, and will write version 1 Bloom
+filters when instructed to write.</simpara>
+<simpara>If 1, Git will only read version 1 Bloom filters, and will write version 1
+Bloom filters.</simpara>
+<simpara>If 2, Git will only read version 2 Bloom filters, and will write version 2
+Bloom filters.</simpara>
+<simpara>See <xref linkend="git-commit-graph(1)" /> for more information.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-commit-graph(1)__file_format">
+<title>FILE FORMAT</title>
+<simpara>see <xref linkend="gitformat-commit-graph(5)" />.</simpara>
+</simplesect>
+<simplesect id="git-commit-graph(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

@@ -1,0 +1,223 @@
+﻿// TortoiseGit - a Windows shell extension for easy version control
+
+// Copyright (C) 2008-2021, 2023-2025 - TortoiseGit
+// Copyright (C) 2003-2008 - TortoiseSVN
+
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+//
+
+#include "stdafx.h"
+#include "TortoiseProc.h"
+#include "SetMainPage.h"
+#include "AppUtils.h"
+#include "Git.h"
+#include "MessageBox.h"
+#include "Libraries.h"
+#include "../../TGitCache/CacheInterface.h"
+#include "LangDll.h"
+
+IMPLEMENT_DYNAMIC(CSetMainPage, ISettingsPropPage)
+CSetMainPage::CSetMainPage()
+	: ISettingsPropPage(CSetMainPage::IDD)
+	, m_bCheckNewer(TRUE)
+	, m_dwLanguage(0)
+	, m_dwMsysGitVersion(CRegDWORD(L"Software\\TortoiseGit\\git_cached_version", 0))
+{
+	m_regLanguage = CRegDWORD(L"Software\\TortoiseGit\\LanguageID", CLangDll::s_defaultLang);
+
+	m_regMsysGitPath = CRegString(REG_MSYSGIT_PATH);
+	m_regMsysGitExtranPath =CRegString(REG_MSYSGIT_EXTRA_PATH);
+
+	m_sMsysGitPath = m_regMsysGitPath;
+	m_sMsysGitExtranPath = m_regMsysGitExtranPath;
+
+	m_regCheckNewer = CRegDWORD(L"Software\\TortoiseGit\\VersionCheck", TRUE);
+}
+
+CSetMainPage::~CSetMainPage()
+{
+}
+
+void CSetMainPage::DoDataExchange(CDataExchange* pDX)
+{
+	ISettingsPropPage::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LANGUAGECOMBO, m_LanguageCombo);
+	m_dwLanguage = static_cast<DWORD>(m_LanguageCombo.GetItemData(m_LanguageCombo.GetCurSel()));
+	DDX_Text(pDX, IDC_MSYSGIT_PATH, m_sMsysGitPath);
+	DDX_Text(pDX, IDC_MSYSGIT_EXTERN_PATH, m_sMsysGitExtranPath);
+	DDX_Check(pDX, IDC_CHECKNEWERVERSION, m_bCheckNewer);
+}
+
+
+BEGIN_MESSAGE_MAP(CSetMainPage, ISettingsPropPage)
+	ON_CBN_SELCHANGE(IDC_LANGUAGECOMBO, OnModified)
+//	ON_EN_CHANGE(IDC_TEMPEXTENSIONS, OnModified)
+	ON_BN_CLICKED(IDC_CHECKNEWERVERSION, OnClickVersioncheck)
+	ON_BN_CLICKED(IDC_CHECKNEWERBUTTON, OnBnClickedChecknewerbutton)
+	ON_BN_CLICKED(IDC_MSYSGIT_BROWSE,OnBrowseDir)
+	ON_BN_CLICKED(IDC_MSYSGIT_CHECK,OnCheck)
+	ON_EN_CHANGE(IDC_MSYSGIT_PATH, OnMsysGitPathModify)
+	ON_EN_CHANGE(IDC_MSYSGIT_EXTERN_PATH, OnModified)
+	ON_BN_CLICKED(IDC_BUTTON_SHOW_ENV, &CSetMainPage::OnBnClickedButtonShowEnv)
+	ON_BN_CLICKED(IDC_CREATELIB, &CSetMainPage::OnBnClickedCreatelib)
+	ON_BN_CLICKED(IDC_RUNFIRSTSTARTWIZARD, &CSetMainPage::OnBnClickedRunfirststartwizard)
+END_MESSAGE_MAP()
+
+BOOL CSetMainPage::OnInitDialog()
+{
+	ISettingsPropPage::OnInitDialog();
+
+	EnableToolTips();
+	AdjustControlSize(IDC_CHECKNEWERVERSION);
+
+	m_dwLanguage = m_regLanguage;
+	m_bCheckNewer = m_regCheckNewer;
+
+	m_tooltips.AddTool(IDC_MSYSGIT_PATH,IDS_MSYSGIT_PATH_TT);
+	m_tooltips.AddTool(IDC_MSYSGIT_EXTERN_PATH, IDS_EXTRAPATH_TT);
+	m_tooltips.AddTool(IDC_CHECKNEWERVERSION, IDS_SETTINGS_CHECKNEWER_TT);
+	m_tooltips.AddTool(IDC_CREATELIB, IDS_SETTINGS_CREATELIB_TT);
+
+	SHAutoComplete(GetDlgItem(IDC_MSYSGIT_PATH)->m_hWnd, SHACF_FILESYSTEM);
+
+	// set up the language selecting combobox
+	auto installed = CLangDll::GetInstalledLanguages(true);
+	std::for_each(installed.cbegin(), installed.cend(), [&](auto& item) {
+		const int pos = m_LanguageCombo.AddString(item.first);
+		m_LanguageCombo.SetItemData(pos, item.second);
+	});
+
+	for (int i=0; i<m_LanguageCombo.GetCount(); i++)
+	{
+		if (m_LanguageCombo.GetItemData(i) == m_dwLanguage)
+			m_LanguageCombo.SetCurSel(i);
+	}
+
+	UpdateData(FALSE);
+	return TRUE;
+}
+
+void CSetMainPage::OnClickVersioncheck()
+{
+	if (m_bCheckNewer && CMessageBox::Show(GetSafeHwnd(), IDS_DISABLEUPDATECHECKS, IDS_APPNAME, 2, IDI_QUESTION, IDS_DISABLEUPDATECHECKSBUTTON, IDS_ABORTBUTTON) != 1)
+		return;
+	m_bCheckNewer = !m_bCheckNewer;
+	UpdateData(FALSE);
+	SetModified();
+}
+
+void CSetMainPage::OnModified()
+{
+	SetModified();
+}
+
+void CSetMainPage::OnMsysGitPathModify()
+{
+	this->UpdateData();
+	if (GuessExtraPath(m_sMsysGitPath, m_sMsysGitExtranPath))
+		UpdateData(FALSE);
+	SetModified();
+}
+
+BOOL CSetMainPage::OnApply()
+{
+	UpdateData();
+
+	PerformCommonGitPathCleanup(m_sMsysGitPath);
+	UpdateData(FALSE);
+
+	Store(m_dwLanguage, m_regLanguage);
+	bool gitChanged = false;
+	if (m_sMsysGitPath.Compare(CString(m_regMsysGitPath)) ||
+		this->m_sMsysGitExtranPath.Compare(CString(m_regMsysGitExtranPath)))
+	{
+		Store(m_sMsysGitPath, m_regMsysGitPath);
+		Store(m_sMsysGitExtranPath, m_regMsysGitExtranPath);
+		gitChanged = true;
+	}
+	Store(m_bCheckNewer, m_regCheckNewer);
+
+	// only complete if the msysgit directory is ok
+	if (!CheckGitExe(GetSafeHwnd(), m_sMsysGitPath, m_sMsysGitExtranPath, IDC_MSYSGIT_VER, [&](UINT helpid) { if (!CAppUtils::StartHtmlHelp(0x20000 + helpid)) { AfxMessageBox(AFX_IDP_FAILED_TO_LAUNCH_HELP); } }))
+		return 0;
+
+	if (gitChanged || g_Git.ms_LastMsysGitVersion != static_cast<int>(m_dwMsysGitVersion))
+	{
+		if (HWND hWnd = ::FindWindow(TGIT_CACHE_WINDOW_NAME, TGIT_CACHE_WINDOW_NAME); hWnd)
+			::PostMessage(hWnd, WM_CLOSE, reinterpret_cast<WPARAM>(nullptr), reinterpret_cast<LPARAM>(nullptr));
+		if (gitChanged)
+			CMessageBox::Show(GetSafeHwnd(), IDS_GITCHANGED_NEEDRESTART, IDS_APPNAME, MB_ICONINFORMATION);
+	}
+
+	SetModified(FALSE);
+	return ISettingsPropPage::OnApply();
+}
+
+void CSetMainPage::OnBnClickedChecknewerbutton()
+{
+	CAppUtils::RunTortoiseGitProc(L"/command:updatecheck /visible", false, false);
+}
+
+void CSetMainPage::OnBrowseDir()
+{
+	UpdateData(TRUE);
+
+	if (!SelectFolder(GetSafeHwnd(), m_sMsysGitPath, m_sMsysGitExtranPath))
+		return;
+
+	UpdateData(FALSE);
+	SetModified(TRUE);
+}
+
+void CSetMainPage::OnCheck()
+{
+	UpdateData(TRUE);
+
+	CheckGitExe(GetSafeHwnd(), m_sMsysGitPath, m_sMsysGitExtranPath, IDC_MSYSGIT_VER, [&](UINT helpid) { if (!CAppUtils::StartHtmlHelp(0x20000 + helpid)) { AfxMessageBox(AFX_IDP_FAILED_TO_LAUNCH_HELP); } });
+
+	UpdateData(FALSE);
+}
+
+void CSetMainPage::OnBnClickedButtonShowEnv()
+{
+	CString err;
+	CString tempfile=::GetTempFile();
+	if (tempfile.IsEmpty())
+	{
+		MessageBox(L"Could not create temp file.", L"TortoiseGit", MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	CString cmd = L"cmd /c set";
+	if (g_Git.RunLogFile(cmd, tempfile, &err))
+	{
+		CMessageBox::Show(GetSafeHwnd(), L"Could not get environment variables:\n" + err, L"TortoiseGit", MB_OK);
+		return;
+	}
+	::SetFileAttributes(tempfile, FILE_ATTRIBUTE_READONLY);
+	CAppUtils::LaunchAlternativeEditor(tempfile);
+}
+
+void CSetMainPage::OnBnClickedCreatelib()
+{
+	CoInitialize(nullptr);
+	EnsureGitLibrary();
+	CoUninitialize();
+}
+
+void CSetMainPage::OnBnClickedRunfirststartwizard()
+{
+	CAppUtils::RunTortoiseGitProc(L"/command:firststart", false, false);
+}

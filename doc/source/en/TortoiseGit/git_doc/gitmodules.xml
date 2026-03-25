@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="gitmodules(5)">
+    <title>gitmodules(5)</title>
+<indexterm>
+<primary>gitmodules(5)</primary>
+</indexterm>
+<simplesect id="gitmodules(5)__name">
+<title>NAME</title>
+<simpara>gitmodules - Defining submodule properties</simpara>
+</simplesect>
+<simplesect id="gitmodules(5)__synopsis">
+<title>SYNOPSIS</title>
+<simpara>$GIT_WORK_TREE/.gitmodules</simpara>
+</simplesect>
+<simplesect id="gitmodules(5)__description">
+<title>DESCRIPTION</title>
+<simpara>The <emphasis>.gitmodules</emphasis> file, located in the top-level directory of a Git
+working tree, is a text file with a syntax matching the requirements
+of <xref linkend="git-config(1)" />.</simpara>
+<simpara>The file contains one subsection per submodule, and the subsection value
+is the name of the submodule. The name is set to the path where the
+submodule has been added unless it was customized with the <emphasis>--name</emphasis>
+option of <emphasis>git submodule add</emphasis>. Each submodule section also contains the
+following required keys:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+submodule.&lt;name&gt;.path
+</term>
+<listitem>
+<simpara>
+        Defines the path, relative to the top-level directory of the Git
+        working tree, where the submodule is expected to be checked out.
+        The path name must not end with a <emphasis>/</emphasis>. All submodule paths must
+        be unique within the <emphasis>.gitmodules</emphasis> file.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+submodule.&lt;name&gt;.url
+</term>
+<listitem>
+<simpara>
+        Defines a URL from which the submodule repository can be cloned.
+        This may be either an absolute URL ready to be passed to
+        <xref linkend="git-clone(1)" /> or (if it begins with <emphasis>./</emphasis> or <emphasis>../</emphasis>) a location
+        relative to the superproject's origin repository.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>In addition, there are a number of optional keys:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+submodule.&lt;name&gt;.update
+</term>
+<listitem>
+<simpara>
+        Defines the default update procedure for the named submodule,
+        i.e. how the submodule is updated by the <emphasis>git submodule update</emphasis>
+        command in the superproject. This is only used by <emphasis>git
+        submodule init</emphasis> to initialize the configuration variable of
+        the same name. Allowed values here are <emphasis>checkout</emphasis>, <emphasis>rebase</emphasis>,
+        <emphasis>merge</emphasis> or <emphasis>none</emphasis>, but not <emphasis>!command</emphasis> (for security reasons).
+        See the description of the <emphasis>update</emphasis> command in
+        <xref linkend="git-submodule(1)" /> for more details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+submodule.&lt;name&gt;.branch
+</term>
+<listitem>
+<simpara>
+        A remote branch name for tracking updates in the upstream submodule.
+        If the option is not specified, it defaults to the remote <emphasis>HEAD</emphasis>.
+        A special value of <emphasis>.</emphasis> is used to indicate that the name of the branch
+        in the submodule should be the same name as the current branch in the
+        current repository.  See the <emphasis>--remote</emphasis> documentation in
+        <xref linkend="git-submodule(1)" /> for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+submodule.&lt;name&gt;.fetchRecurseSubmodules
+</term>
+<listitem>
+<simpara>
+        This option can be used to control recursive fetching of this
+        submodule. If this option is also present in the submodule's entry in
+        <emphasis>.git/config</emphasis> of the superproject, the setting there will override the
+        one found in <emphasis>.gitmodules</emphasis>.
+        Both settings can be overridden on the command line by using the
+        <emphasis>--[no-]recurse-submodules</emphasis> option to <emphasis>git fetch</emphasis> and <emphasis>git pull</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+submodule.&lt;name&gt;.ignore
+</term>
+<listitem>
+<simpara>
+        Defines under what circumstances <emphasis>git status</emphasis> and the diff family show
+        a submodule as modified. The following values are supported:
+</simpara>
+<variablelist>
+<varlistentry>
+<term>
+all
+</term>
+<listitem>
+<simpara>
+The submodule will never be considered modified (but will
+            nonetheless show up in the output of status and commit when it has
+            been staged).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+dirty
+</term>
+<listitem>
+<simpara>
+All changes to the submodule's work tree will be ignored, only
+            committed differences between the <emphasis>HEAD</emphasis> of the submodule and its
+            recorded state in the superproject are taken into account.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+untracked
+</term>
+<listitem>
+<simpara>
+Only untracked files in submodules will be ignored.
+            Committed differences and modifications to tracked files will show
+            up.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+none
+</term>
+<listitem>
+<simpara>
+No modifications to submodules are ignored, all of committed
+            differences, and modifications to tracked and untracked files are
+            shown. This is the default option.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>If this option is also present in the submodule's entry in <emphasis>.git/config</emphasis>
+of the superproject, the setting there will override the one found in
+<emphasis>.gitmodules</emphasis>.</simpara>
+<simpara>Both settings can be overridden on the command line by using the
+<emphasis>--ignore-submodules</emphasis> option. The <emphasis>git submodule</emphasis> commands are not
+affected by this setting.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+submodule.&lt;name&gt;.shallow
+</term>
+<listitem>
+<simpara>
+        When set to true, a clone of this submodule will be performed as a
+        shallow clone (with a history depth of 1) unless the user explicitly
+        asks for a non-shallow clone.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="gitmodules(5)__notes">
+<title>NOTES</title>
+<simpara>Git does not allow the <emphasis>.gitmodules</emphasis> file within a working tree to be a
+symbolic link, and will refuse to check out such a tree entry. This
+keeps behavior consistent when the file is accessed from the index or a
+tree versus from the filesystem, and helps Git reliably enforce security
+checks of the file contents.</simpara>
+</simplesect>
+<simplesect id="gitmodules(5)__examples">
+<title>EXAMPLES</title>
+<simpara>Consider the following <emphasis>.gitmodules</emphasis> file:</simpara>
+<screen>[submodule "libfoo"]
+        path = include/foo
+        url = git://foo.com/git/lib.git
+
+[submodule "libbar"]
+        path = include/bar
+        url = git://bar.com/git/lib.git</screen>
+<simpara>This defines two submodules, <emphasis>libfoo</emphasis> and <emphasis>libbar</emphasis>. These are expected to
+be checked out in the paths <emphasis>include/foo</emphasis> and <emphasis>include/bar</emphasis>, and for both
+submodules a URL is specified which can be used for cloning the submodules.</simpara>
+</simplesect>
+<simplesect id="gitmodules(5)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="git-submodule(1)" />, <xref linkend="gitsubmodules(7)" />, <xref linkend="git-config(1)" /></simpara>
+</simplesect>
+<simplesect id="gitmodules(5)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

@@ -1,0 +1,3810 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git(1)">
+    <title>git(1)</title>
+<indexterm>
+<primary>git(1)</primary>
+</indexterm>
+<simplesect id="git(1)__name">
+<title>NAME</title>
+<simpara>git - the stupid content tracker</simpara>
+</simplesect>
+<simplesect id="git(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><emphasis>git</emphasis> [-v | --version] [-h | --help] [-C &lt;path&gt;] [-c &lt;name&gt;=&lt;value&gt;]
+    [--exec-path[=&lt;path&gt;]] [--html-path] [--man-path] [--info-path]
+    [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]
+    [--no-optional-locks] [--no-advice] [--bare] [--git-dir=&lt;path&gt;]
+    [--work-tree=&lt;path&gt;] [--namespace=&lt;name&gt;] [--config-env=&lt;name&gt;=&lt;envvar&gt;]
+    &lt;command&gt; [&lt;args&gt;]</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Git is a fast, scalable, distributed revision control system with an
+unusually rich command set that provides both high-level operations
+and full access to internals.</simpara>
+<simpara>See <xref linkend="gittutorial(7)" /> to get started, then see
+<xref linkend="giteveryday(7)" /> for a useful minimum set of
+commands.  The <link linkend="git_user-manual">Git User's Manual</link> has a more
+in-depth introduction.</simpara>
+<simpara>After you mastered the basic concepts, you can come back to this
+page to learn what commands Git offers.  You can learn more about
+individual Git commands with "git help command".  <xref linkend="gitcli(7)" />
+manual page gives you an overview of the command-line command syntax.</simpara>
+<simpara>A formatted and hyperlinked copy of the latest Git documentation
+can be viewed at <ulink url="https://git.github.io/htmldocs/git.html">https://git.github.io/htmldocs/git.html</ulink>
+or <ulink url="https://git-scm.com/docs">https://git-scm.com/docs</ulink>.</simpara>
+</simplesect>
+<simplesect id="git(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-v
+</term>
+<term>
+--version
+</term>
+<listitem>
+<simpara>
+        Prints the Git suite version that the <emphasis>git</emphasis> program came from.
+</simpara>
+<simpara>This option is internally converted to <emphasis>git version ...</emphasis> and accepts
+the same options as the <xref linkend="git-version(1)" /> command. If <emphasis>--help</emphasis> is
+also given, it takes precedence over <emphasis>--version</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-h
+</term>
+<term>
+--help
+</term>
+<listitem>
+<simpara>
+        Prints the synopsis and a list of the most commonly used
+        commands. If the option <emphasis>--all</emphasis> or <emphasis>-a</emphasis> is given then all
+        available commands are printed. If a Git command is named this
+        option will bring up the manual page for that command.
+</simpara>
+<simpara>Other options are available to control how the manual page is
+displayed. See <xref linkend="git-help(1)" /> for more information,
+because <emphasis>git --help ...</emphasis> is converted internally into <emphasis>git
+help ...</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-C &lt;path&gt;
+</term>
+<listitem>
+<simpara>
+        Run as if git was started in <emphasis>&lt;path&gt;</emphasis> instead of the current working
+        directory.  When multiple <emphasis>-C</emphasis> options are given, each subsequent
+        non-absolute <emphasis>-C &lt;path&gt;</emphasis> is interpreted relative to the preceding <emphasis>-C
+        &lt;path&gt;</emphasis>.  If <emphasis>&lt;path&gt;</emphasis> is present but empty, e.g. <emphasis>-C ""</emphasis>, then the
+        current working directory is left unchanged.
+</simpara>
+<simpara>This option affects options that expect path name like <emphasis>--git-dir</emphasis> and
+<emphasis>--work-tree</emphasis> in that their interpretations of the path names would be
+made relative to the working directory caused by the <emphasis>-C</emphasis> option. For
+example the following invocations are equivalent:</simpara>
+<literallayout class="monospaced">git --git-dir=a.git --work-tree=b -C c status
+git --git-dir=c/a.git --work-tree=c/b status</literallayout>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-c &lt;name&gt;=&lt;value&gt;
+</term>
+<listitem>
+<simpara>
+        Pass a configuration parameter to the command. The value
+        given will override values from configuration files.
+        The &lt;name&gt; is expected in the same format as listed by
+        <emphasis>git config</emphasis> (subkeys separated by dots).
+</simpara>
+<simpara>Note that omitting the <emphasis>=</emphasis> in <emphasis>git -c foo.bar ...</emphasis> is allowed and sets
+<emphasis>foo.bar</emphasis> to the boolean true value (just like <emphasis>[foo]bar</emphasis> would in a
+config file). Including the equals but with an empty value (like <emphasis>git -c
+foo.bar= ...</emphasis>) sets <emphasis>foo.bar</emphasis> to the empty string which <emphasis>git config
+--type=bool</emphasis> will convert to <emphasis>false</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--config-env=&lt;name&gt;=&lt;envvar&gt;
+</term>
+<listitem>
+<simpara>
+        Like <emphasis>-c &lt;name&gt;=&lt;value&gt;</emphasis>, give configuration variable
+        <emphasis>&lt;name&gt;</emphasis> a value, where &lt;envvar&gt; is the name of an
+        environment variable from which to retrieve the value. Unlike
+        <emphasis>-c</emphasis> there is no shortcut for directly setting the value to an
+        empty string, instead the environment variable itself must be
+        set to the empty string.  It is an error if the <emphasis>&lt;envvar&gt;</emphasis> does not exist
+        in the environment. <emphasis>&lt;envvar&gt;</emphasis> may not contain an equals sign
+        to avoid ambiguity with <emphasis>&lt;name&gt;</emphasis> containing one.
+</simpara>
+<simpara>This is useful for cases where you want to pass transitory
+configuration options to git, but are doing so on operating systems
+where other processes might be able to read your command line
+(e.g. <emphasis>/proc/self/cmdline</emphasis>), but not your environment
+(e.g. <emphasis>/proc/self/environ</emphasis>). That behavior is the default on
+Linux, but may not be on your system.</simpara>
+<simpara>Note that this might add security for variables such as
+<emphasis>http.extraHeader</emphasis> where the sensitive information is part of
+the value, but not e.g. <emphasis>url.&lt;base&gt;.insteadOf</emphasis> where the
+sensitive information can be part of the key.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--exec-path[=&lt;path&gt;]
+</term>
+<listitem>
+<simpara>
+        Path to wherever your core Git programs are installed.
+        This can also be controlled by setting the GIT_EXEC_PATH
+        environment variable. If no path is given, <emphasis>git</emphasis> will print
+        the current setting and then exit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--html-path
+</term>
+<listitem>
+<simpara>
+        Print the path, without trailing slash, where Git's HTML
+        documentation is installed and exit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--man-path
+</term>
+<listitem>
+<simpara>
+        Print the manpath (see <emphasis>man(1)</emphasis>) for the man pages for
+        this version of Git and exit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--info-path
+</term>
+<listitem>
+<simpara>
+        Print the path where the Info files documenting this
+        version of Git are installed and exit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-p
+</term>
+<term>
+--paginate
+</term>
+<listitem>
+<simpara>
+        Pipe all output into <emphasis>less</emphasis> (or if set, $PAGER) if standard
+        output is a terminal.  This overrides the <emphasis>pager.&lt;cmd&gt;</emphasis>
+        configuration options (see the "Configuration Mechanism" section
+        below).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-P
+</term>
+<term>
+--no-pager
+</term>
+<listitem>
+<simpara>
+        Do not pipe Git output into a pager.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--git-dir=&lt;path&gt;
+</term>
+<listitem>
+<simpara>
+        Set the path to the repository (".git" directory). This can also be
+        controlled by setting the <emphasis>GIT_DIR</emphasis> environment variable. It can be
+        an absolute path or relative path to current working directory.
+</simpara>
+<simpara>Specifying the location of the ".git" directory using this
+option (or <emphasis>GIT_DIR</emphasis> environment variable) turns off the
+repository discovery that tries to find a directory with
+".git" subdirectory (which is how the repository and the
+top-level of the working tree are discovered), and tells Git
+that you are at the top level of the working tree.  If you
+are not at the top-level directory of the working tree, you
+should tell Git where the top-level of the working tree is,
+with the <emphasis>--work-tree=&lt;path&gt;</emphasis> option (or <emphasis>GIT_WORK_TREE</emphasis>
+environment variable)</simpara>
+<simpara>If you just want to run git as if it was started in <emphasis>&lt;path&gt;</emphasis> then use
+<emphasis>git -C &lt;path&gt;</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--work-tree=&lt;path&gt;
+</term>
+<listitem>
+<simpara>
+        Set the path to the working tree. It can be an absolute path
+        or a path relative to the current working directory.
+        This can also be controlled by setting the GIT_WORK_TREE
+        environment variable and the core.worktree configuration
+        variable (see core.worktree in <xref linkend="git-config(1)" /> for a
+        more detailed discussion).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--namespace=&lt;path&gt;
+</term>
+<listitem>
+<simpara>
+        Set the Git namespace.  See <xref linkend="gitnamespaces(7)" /> for more
+        details.  Equivalent to setting the <emphasis>GIT_NAMESPACE</emphasis> environment
+        variable.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--bare
+</term>
+<listitem>
+<simpara>
+        Treat the repository as a bare repository.  If GIT_DIR
+        environment is not set, it is set to the current working
+        directory.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-replace-objects
+</term>
+<listitem>
+<simpara>
+        Do not use replacement refs to replace Git objects.
+        This is equivalent to exporting the <emphasis>GIT_NO_REPLACE_OBJECTS</emphasis>
+        environment variable with any value.
+        See <xref linkend="git-replace(1)" /> for more information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-lazy-fetch
+</term>
+<listitem>
+<simpara>
+        Do not fetch missing objects from the promisor remote on
+        demand.  Useful together with <emphasis>git cat-file -e &lt;object&gt;</emphasis> to
+        see if the object is locally available.
+        This is equivalent to setting the <emphasis>GIT_NO_LAZY_FETCH</emphasis>
+        environment variable to <emphasis>1</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-optional-locks
+</term>
+<listitem>
+<simpara>
+        Do not perform optional operations that require locks. This is
+        equivalent to setting the <emphasis>GIT_OPTIONAL_LOCKS</emphasis> to <emphasis>0</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-advice
+</term>
+<listitem>
+<simpara>
+        Disable all advice hints from being printed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--literal-pathspecs
+</term>
+<listitem>
+<simpara>
+        Treat pathspecs literally (i.e. no globbing, no pathspec magic).
+        This is equivalent to setting the <emphasis>GIT_LITERAL_PATHSPECS</emphasis> environment
+        variable to <emphasis>1</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--glob-pathspecs
+</term>
+<listitem>
+<simpara>
+        Add "glob" magic to all pathspec. This is equivalent to setting
+        the <emphasis>GIT_GLOB_PATHSPECS</emphasis> environment variable to <emphasis>1</emphasis>. Disabling
+        globbing on individual pathspecs can be done using pathspec
+        magic ":(literal)"
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--noglob-pathspecs
+</term>
+<listitem>
+<simpara>
+        Add "literal" magic to all pathspec. This is equivalent to setting
+        the <emphasis>GIT_NOGLOB_PATHSPECS</emphasis> environment variable to <emphasis>1</emphasis>. Enabling
+        globbing on individual pathspecs can be done using pathspec
+        magic ":(glob)"
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--icase-pathspecs
+</term>
+<listitem>
+<simpara>
+        Add "icase" magic to all pathspec. This is equivalent to setting
+        the <emphasis>GIT_ICASE_PATHSPECS</emphasis> environment variable to <emphasis>1</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--list-cmds=&lt;group&gt;[,&lt;group&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        List commands by group. This is an internal/experimental
+        option and may change or be removed in the future. Supported
+        groups are: builtins, parseopt (builtin commands that use
+        parse-options), deprecated (deprecated builtins),
+        main (all commands in libexec directory),
+        others (all other commands in <emphasis>$PATH</emphasis> that have git- prefix),
+        list-&lt;category&gt; (see categories in command-list.txt),
+        nohelpers (exclude helper commands), alias and config
+        (retrieve command list from config variable completion.commands)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--attr-source=&lt;tree-ish&gt;
+</term>
+<listitem>
+<simpara>
+        Read gitattributes from &lt;tree-ish&gt; instead of the worktree. See
+        <xref linkend="gitattributes(5)" />. This is equivalent to setting the
+        <emphasis>GIT_ATTR_SOURCE</emphasis> environment variable.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git(1)__git_commands">
+<title>GIT COMMANDS</title>
+<simpara>We divide Git into high level ("porcelain") commands and low level
+("plumbing") commands.</simpara>
+</simplesect>
+<simplesect id="git(1)__high_level_commands_porcelain">
+<title>High-level commands (porcelain)</title>
+<simpara>We separate the porcelain commands into the main commands and some
+ancillary user utilities.</simpara>
+<section id="git(1)__main_porcelain_commands">
+<title>Main porcelain commands</title>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="git-add(1)" />
+</term>
+<listitem>
+<simpara>
+        Add file contents to the index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-am(1)" />
+</term>
+<listitem>
+<simpara>
+        Apply a series of patches from a mailbox.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-archive(1)" />
+</term>
+<listitem>
+<simpara>
+        Create an archive of files from a named tree.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-backfill(1)" />
+</term>
+<listitem>
+<simpara>
+        Download missing objects in a partial clone.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-bisect(1)" />
+</term>
+<listitem>
+<simpara>
+        Use binary search to find the commit that introduced a bug.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-branch(1)" />
+</term>
+<listitem>
+<simpara>
+        List, create, or delete branches.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-bundle(1)" />
+</term>
+<listitem>
+<simpara>
+        Move objects and refs by archive.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-checkout(1)" />
+</term>
+<listitem>
+<simpara>
+        Switch branches or restore working tree files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-cherry-pick(1)" />
+</term>
+<listitem>
+<simpara>
+        Apply the changes introduced by some existing commits.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-citool(1)" />
+</term>
+<listitem>
+<simpara>
+        Graphical alternative to git-commit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-clean(1)" />
+</term>
+<listitem>
+<simpara>
+        Remove untracked files from the working tree.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-clone(1)" />
+</term>
+<listitem>
+<simpara>
+        Clone a repository into a new directory.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-commit(1)" />
+</term>
+<listitem>
+<simpara>
+        Record changes to the repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-describe(1)" />
+</term>
+<listitem>
+<simpara>
+        Give an object a human readable name based on an available ref.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-diff(1)" />
+</term>
+<listitem>
+<simpara>
+        Show changes between commits, commit and working tree, etc.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-fetch(1)" />
+</term>
+<listitem>
+<simpara>
+        Download objects and refs from another repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-format-patch(1)" />
+</term>
+<listitem>
+<simpara>
+        Prepare patches for e-mail submission.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-gc(1)" />
+</term>
+<listitem>
+<simpara>
+        Cleanup unnecessary files and optimize the local repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-grep(1)" />
+</term>
+<listitem>
+<simpara>
+        Print lines matching a pattern.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-gui(1)" />
+</term>
+<listitem>
+<simpara>
+        A portable graphical interface to Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-init(1)" />
+</term>
+<listitem>
+<simpara>
+        Create an empty Git repository or reinitialize an existing one.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-log(1)" />
+</term>
+<listitem>
+<simpara>
+        Show commit logs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-maintenance(1)" />
+</term>
+<listitem>
+<simpara>
+        Run tasks to optimize Git repository data.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-merge(1)" />
+</term>
+<listitem>
+<simpara>
+        Join two or more development histories together.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-mv(1)" />
+</term>
+<listitem>
+<simpara>
+        Move or rename a file, a directory, or a symlink.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-notes(1)" />
+</term>
+<listitem>
+<simpara>
+        Add or inspect object notes.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-pull(1)" />
+</term>
+<listitem>
+<simpara>
+        Fetch from and integrate with another repository or a local branch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-push(1)" />
+</term>
+<listitem>
+<simpara>
+        Update remote refs along with associated objects.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-range-diff(1)" />
+</term>
+<listitem>
+<simpara>
+        Compare two commit ranges (e.g. two versions of a branch).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-rebase(1)" />
+</term>
+<listitem>
+<simpara>
+        Reapply commits on top of another base tip.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-reset(1)" />
+</term>
+<listitem>
+<simpara>
+        Set <emphasis>HEAD</emphasis> or the index to a known state.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-restore(1)" />
+</term>
+<listitem>
+<simpara>
+        Restore working tree files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-revert(1)" />
+</term>
+<listitem>
+<simpara>
+        Revert some existing commits.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-rm(1)" />
+</term>
+<listitem>
+<simpara>
+        Remove files from the working tree and from the index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-shortlog(1)" />
+</term>
+<listitem>
+<simpara>
+        Summarize <emphasis>git log</emphasis> output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-show(1)" />
+</term>
+<listitem>
+<simpara>
+        Show various types of objects.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-sparse-checkout(1)" />
+</term>
+<listitem>
+<simpara>
+        Reduce your working tree to a subset of tracked files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-stash(1)" />
+</term>
+<listitem>
+<simpara>
+        Stash the changes in a dirty working directory away.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-status(1)" />
+</term>
+<listitem>
+<simpara>
+        Show the working tree status.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-submodule(1)" />
+</term>
+<listitem>
+<simpara>
+        Initialize, update or inspect submodules.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-switch(1)" />
+</term>
+<listitem>
+<simpara>
+        Switch branches.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-tag(1)" />
+</term>
+<listitem>
+<simpara>
+        Create, list, delete or verify tags.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-worktree(1)" />
+</term>
+<listitem>
+<simpara>
+        Manage multiple working trees.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitk(1)" />
+</term>
+<listitem>
+<simpara>
+        The Git repository browser.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="scalar(1)" />
+</term>
+<listitem>
+<simpara>
+        A tool for managing large Git repositories.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="git(1)__ancillary_commands">
+<title>Ancillary Commands</title>
+<simpara>Manipulators:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="git-config(1)" />
+</term>
+<listitem>
+<simpara>
+        Get and set repository or global options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-fast-export(1)" />
+</term>
+<listitem>
+<simpara>
+        Git data exporter.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-fast-import(1)" />
+</term>
+<listitem>
+<simpara>
+        Backend for fast Git data importers.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-filter-branch(1)" />
+</term>
+<listitem>
+<simpara>
+        Rewrite branches.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-mergetool(1)" />
+</term>
+<listitem>
+<simpara>
+        Run merge conflict resolution tools to resolve merge conflicts.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-pack-refs(1)" />
+</term>
+<listitem>
+<simpara>
+        Pack heads and tags for efficient repository access.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-prune(1)" />
+</term>
+<listitem>
+<simpara>
+        Prune all unreachable objects from the object database.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-reflog(1)" />
+</term>
+<listitem>
+<simpara>
+        Manage reflog information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-refs(1)" />
+</term>
+<listitem>
+<simpara>
+        Low-level access to refs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-remote(1)" />
+</term>
+<listitem>
+<simpara>
+        Manage set of tracked repositories.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-repack(1)" />
+</term>
+<listitem>
+<simpara>
+        Pack unpacked objects in a repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-replace(1)" />
+</term>
+<listitem>
+<simpara>
+        Create, list, delete refs to replace objects.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Interrogators:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="git-annotate(1)" />
+</term>
+<listitem>
+<simpara>
+        Annotate file lines with commit information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-blame(1)" />
+</term>
+<listitem>
+<simpara>
+        Show what revision and author last modified each line of a file.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-bugreport(1)" />
+</term>
+<listitem>
+<simpara>
+        Collect information for user to file a bug report.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-count-objects(1)" />
+</term>
+<listitem>
+<simpara>
+        Count unpacked number of objects and their disk consumption.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-diagnose(1)" />
+</term>
+<listitem>
+<simpara>
+        Generate a zip archive of diagnostic information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-difftool(1)" />
+</term>
+<listitem>
+<simpara>
+        Show changes using common diff tools.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-fsck(1)" />
+</term>
+<listitem>
+<simpara>
+        Verifies the connectivity and validity of the objects in the database.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-help(1)" />
+</term>
+<listitem>
+<simpara>
+        Display help information about Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-instaweb(1)" />
+</term>
+<listitem>
+<simpara>
+        Instantly browse your working repository in gitweb.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-merge-tree(1)" />
+</term>
+<listitem>
+<simpara>
+        Perform merge without touching index or working tree.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-rerere(1)" />
+</term>
+<listitem>
+<simpara>
+        Reuse recorded resolution of conflicted merges.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-show-branch(1)" />
+</term>
+<listitem>
+<simpara>
+        Show branches and their commits.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-verify-commit(1)" />
+</term>
+<listitem>
+<simpara>
+        Check the GPG signature of commits.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-verify-tag(1)" />
+</term>
+<listitem>
+<simpara>
+        Check the GPG signature of tags.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-version(1)" />
+</term>
+<listitem>
+<simpara>
+        Display version information about Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-whatchanged(1)" />
+</term>
+<listitem>
+<simpara>
+        Show logs with differences each commit introduces.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitweb(1)" />
+</term>
+<listitem>
+<simpara>
+        Git web interface (web frontend to Git repositories).
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="git(1)__interacting_with_others">
+<title>Interacting with Others</title>
+<simpara>These commands are to interact with foreign SCM and with other
+people via patch over e-mail.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="git-archimport(1)" />
+</term>
+<listitem>
+<simpara>
+        Import a GNU Arch repository into Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-cvsexportcommit(1)" />
+</term>
+<listitem>
+<simpara>
+        Export a single commit to a CVS checkout.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-cvsimport(1)" />
+</term>
+<listitem>
+<simpara>
+        Salvage your data out of another SCM people love to hate.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-cvsserver(1)" />
+</term>
+<listitem>
+<simpara>
+        A CVS server emulator for Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-imap-send(1)" />
+</term>
+<listitem>
+<simpara>
+        Send a collection of patches from stdin to an IMAP folder.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-p4(1)" />
+</term>
+<listitem>
+<simpara>
+        Import from and submit to Perforce repositories.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-quiltimport(1)" />
+</term>
+<listitem>
+<simpara>
+        Applies a quilt patchset onto the current branch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-request-pull(1)" />
+</term>
+<listitem>
+<simpara>
+        Generates a summary of pending changes.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-send-email(1)" />
+</term>
+<listitem>
+<simpara>
+        Send a collection of patches as emails.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-svn(1)" />
+</term>
+<listitem>
+<simpara>
+        Bidirectional operation between a Subversion repository and Git.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="git(1)__reset_restore_and_revert">
+<title>Reset, restore and revert</title>
+<simpara>There are three commands with similar names: <emphasis>git reset</emphasis>,
+<emphasis>git restore</emphasis> and <emphasis>git revert</emphasis>.</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+<xref linkend="git-revert(1)" /> is about making a new commit that reverts the
+  changes made by other commits.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<xref linkend="git-restore(1)" /> is about restoring files in the working tree
+  from either the index or another commit. This command does not
+  update your branch. The command can also be used to restore files in
+  the index from another commit.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<xref linkend="git-reset(1)" /> is about updating your branch, moving the tip
+  in order to add or remove commits from the branch. This operation
+  changes the commit history.
+</simpara>
+<simpara><emphasis>git reset</emphasis> can also be used to restore the index, overlapping with
+<emphasis>git restore</emphasis>.</simpara>
+</listitem>
+</itemizedlist>
+</section>
+</simplesect>
+<simplesect id="git(1)__low_level_commands_plumbing">
+<title>Low-level commands (plumbing)</title>
+<simpara>Although Git includes its
+own porcelain layer, its low-level commands are sufficient to support
+development of alternative porcelains.  Developers of such porcelains
+might start by reading about <xref linkend="git-update-index(1)" /> and
+<xref linkend="git-read-tree(1)" />.</simpara>
+<simpara>The interface (input, output, set of options and the semantics)
+to these low-level commands are meant to be a lot more stable
+than Porcelain level commands, because these commands are
+primarily for scripted use.  The interface to Porcelain commands
+on the other hand are subject to change in order to improve the
+end user experience.</simpara>
+<simpara>The following description divides
+the low-level commands into commands that manipulate objects (in
+the repository, index, and working tree), commands that interrogate and
+compare objects, and commands that move objects and references between
+repositories.</simpara>
+<section id="git(1)__manipulation_commands">
+<title>Manipulation commands</title>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="git-apply(1)" />
+</term>
+<listitem>
+<simpara>
+        Apply a patch to files and/or to the index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-checkout-index(1)" />
+</term>
+<listitem>
+<simpara>
+        Copy files from the index to the working tree.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-commit-graph(1)" />
+</term>
+<listitem>
+<simpara>
+        Write and verify Git commit-graph files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-commit-tree(1)" />
+</term>
+<listitem>
+<simpara>
+        Create a new commit object.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-hash-object(1)" />
+</term>
+<listitem>
+<simpara>
+        Compute object ID and optionally create an object from a file.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-index-pack(1)" />
+</term>
+<listitem>
+<simpara>
+        Build pack index file for an existing packed archive.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-merge-file(1)" />
+</term>
+<listitem>
+<simpara>
+        Run a three-way file merge.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-merge-index(1)" />
+</term>
+<listitem>
+<simpara>
+        Run a merge for files needing merging.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-mktag(1)" />
+</term>
+<listitem>
+<simpara>
+        Creates a tag object with extra validation.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-mktree(1)" />
+</term>
+<listitem>
+<simpara>
+        Build a tree-object from ls-tree formatted text.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-multi-pack-index(1)" />
+</term>
+<listitem>
+<simpara>
+        Write and verify multi-pack-indexes.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-pack-objects(1)" />
+</term>
+<listitem>
+<simpara>
+        Create a packed archive of objects.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-prune-packed(1)" />
+</term>
+<listitem>
+<simpara>
+        Remove extra objects that are already in pack files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-read-tree(1)" />
+</term>
+<listitem>
+<simpara>
+        Reads tree information into the index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-replay(1)" />
+</term>
+<listitem>
+<simpara>
+        EXPERIMENTAL: Replay commits on a new base, works with bare repos too.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-symbolic-ref(1)" />
+</term>
+<listitem>
+<simpara>
+        Read, modify and delete symbolic refs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-unpack-objects(1)" />
+</term>
+<listitem>
+<simpara>
+        Unpack objects from a packed archive.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-update-index(1)" />
+</term>
+<listitem>
+<simpara>
+        Register file contents in the working tree to the index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-update-ref(1)" />
+</term>
+<listitem>
+<simpara>
+        Update the object name stored in a ref safely.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-write-tree(1)" />
+</term>
+<listitem>
+<simpara>
+        Create a tree object from the current index.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="git(1)__interrogation_commands">
+<title>Interrogation commands</title>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="git-cat-file(1)" />
+</term>
+<listitem>
+<simpara>
+        Provide contents or details of repository objects.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-cherry(1)" />
+</term>
+<listitem>
+<simpara>
+        Find commits yet to be applied to upstream.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-diff-files(1)" />
+</term>
+<listitem>
+<simpara>
+        Compares files in the working tree and the index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-diff-index(1)" />
+</term>
+<listitem>
+<simpara>
+        Compare a tree to the working tree or index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-diff-pairs(1)" />
+</term>
+<listitem>
+<simpara>
+        Compare the content and mode of provided blob pairs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-diff-tree(1)" />
+</term>
+<listitem>
+<simpara>
+        Compares the content and mode of blobs found via two tree objects.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-for-each-ref(1)" />
+</term>
+<listitem>
+<simpara>
+        Output information on each ref.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-for-each-repo(1)" />
+</term>
+<listitem>
+<simpara>
+        Run a Git command on a list of repositories.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-get-tar-commit-id(1)" />
+</term>
+<listitem>
+<simpara>
+        Extract commit ID from an archive created using git-archive.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-last-modified(1)" />
+</term>
+<listitem>
+<simpara>
+        EXPERIMENTAL: Show when files were last modified.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-ls-files(1)" />
+</term>
+<listitem>
+<simpara>
+        Show information about files in the index and the working tree.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-ls-remote(1)" />
+</term>
+<listitem>
+<simpara>
+        List references in a remote repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-ls-tree(1)" />
+</term>
+<listitem>
+<simpara>
+        List the contents of a tree object.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-merge-base(1)" />
+</term>
+<listitem>
+<simpara>
+        Find as good common ancestors as possible for a merge.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-name-rev(1)" />
+</term>
+<listitem>
+<simpara>
+        Find symbolic names for given revs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-pack-redundant(1)" />
+</term>
+<listitem>
+<simpara>
+        Find redundant pack files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-repo(1)" />
+</term>
+<listitem>
+<simpara>
+        Retrieve information about the repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-rev-list(1)" />
+</term>
+<listitem>
+<simpara>
+        Lists commit objects in reverse chronological order.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-rev-parse(1)" />
+</term>
+<listitem>
+<simpara>
+        Pick out and massage parameters.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-show-index(1)" />
+</term>
+<listitem>
+<simpara>
+        Show packed archive index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-show-ref(1)" />
+</term>
+<listitem>
+<simpara>
+        List references in a local repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-unpack-file(1)" />
+</term>
+<listitem>
+<simpara>
+        Creates a temporary file with a blob's contents.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-var(1)" />
+</term>
+<listitem>
+<simpara>
+        Show a Git logical variable.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-verify-pack(1)" />
+</term>
+<listitem>
+<simpara>
+        Validate packed Git archive files.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>In general, the interrogate commands do not touch the files in
+the working tree.</simpara>
+</section>
+<section id="git(1)__syncing_repositories">
+<title>Syncing repositories</title>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="git-daemon(1)" />
+</term>
+<listitem>
+<simpara>
+        A really simple server for Git repositories.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-fetch-pack(1)" />
+</term>
+<listitem>
+<simpara>
+        Receive missing objects from another repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-http-backend(1)" />
+</term>
+<listitem>
+<simpara>
+        Server side implementation of Git over HTTP.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-send-pack(1)" />
+</term>
+<listitem>
+<simpara>
+        Push objects over Git protocol to another repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-update-server-info(1)" />
+</term>
+<listitem>
+<simpara>
+        Update auxiliary info file to help dumb servers.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>The following are helper commands used by the above; end users
+typically do not use them directly.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="git-http-fetch(1)" />
+</term>
+<listitem>
+<simpara>
+        Download from a remote Git repository via HTTP.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-http-push(1)" />
+</term>
+<listitem>
+<simpara>
+        Push objects over HTTP/DAV to another repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-receive-pack(1)" />
+</term>
+<listitem>
+<simpara>
+        Receive what is pushed into the repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-shell(1)" />
+</term>
+<listitem>
+<simpara>
+        Restricted login shell for Git-only SSH access.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-upload-archive(1)" />
+</term>
+<listitem>
+<simpara>
+        Send archive back to git-archive.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-upload-pack(1)" />
+</term>
+<listitem>
+<simpara>
+        Send objects packed back to git-fetch-pack.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="git(1)__internal_helper_commands">
+<title>Internal helper commands</title>
+<simpara>These are internal helper commands used by other commands; end
+users typically do not use them directly.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="git-check-attr(1)" />
+</term>
+<listitem>
+<simpara>
+        Display gitattributes information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-check-ignore(1)" />
+</term>
+<listitem>
+<simpara>
+        Debug gitignore / exclude files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-check-mailmap(1)" />
+</term>
+<listitem>
+<simpara>
+        Show canonical names and email addresses of contacts.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-check-ref-format(1)" />
+</term>
+<listitem>
+<simpara>
+        Ensures that a reference name is well formed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-column(1)" />
+</term>
+<listitem>
+<simpara>
+        Display data in columns.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-credential(1)" />
+</term>
+<listitem>
+<simpara>
+        Retrieve and store user credentials.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-credential-cache(1)" />
+</term>
+<listitem>
+<simpara>
+        Helper to temporarily store passwords in memory.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-credential-store(1)" />
+</term>
+<listitem>
+<simpara>
+        Helper to store credentials on disk.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-fmt-merge-msg(1)" />
+</term>
+<listitem>
+<simpara>
+        Produce a merge commit message.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-hook(1)" />
+</term>
+<listitem>
+<simpara>
+        Run git hooks.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-interpret-trailers(1)" />
+</term>
+<listitem>
+<simpara>
+        Add or parse structured information in commit messages.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-mailinfo(1)" />
+</term>
+<listitem>
+<simpara>
+        Extracts patch and authorship from a single e-mail message.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-mailsplit(1)" />
+</term>
+<listitem>
+<simpara>
+        Simple UNIX mbox splitter program.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-merge-one-file(1)" />
+</term>
+<listitem>
+<simpara>
+        The standard helper program to use with git-merge-index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-patch-id(1)" />
+</term>
+<listitem>
+<simpara>
+        Compute unique ID for a patch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-sh-i18n(1)" />
+</term>
+<listitem>
+<simpara>
+        Git's i18n setup code for shell scripts.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-sh-setup(1)" />
+</term>
+<listitem>
+<simpara>
+        Common Git shell script setup code.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="git-stripspace(1)" />
+</term>
+<listitem>
+<simpara>
+        Remove unnecessary whitespace.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+</simplesect>
+<simplesect id="git(1)__guides">
+<title>Guides</title>
+<simpara>The following documentation pages are guides about Git concepts.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="gitcore-tutorial(7)" />
+</term>
+<listitem>
+<simpara>
+        A Git core tutorial for developers.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitcredentials(7)" />
+</term>
+<listitem>
+<simpara>
+        Providing usernames and passwords to Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitcvs-migration(7)" />
+</term>
+<listitem>
+<simpara>
+        Git for CVS users.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitdiffcore(7)" />
+</term>
+<listitem>
+<simpara>
+        Tweaking diff output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="giteveryday(7)" />
+</term>
+<listitem>
+<simpara>
+        A useful minimum set of commands for Everyday Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitfaq(7)" />
+</term>
+<listitem>
+<simpara>
+        Frequently asked questions about using Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitglossary(7)" />
+</term>
+<listitem>
+<simpara>
+        A Git Glossary.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitnamespaces(7)" />
+</term>
+<listitem>
+<simpara>
+        Git namespaces.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitremote-helpers(7)" />
+</term>
+<listitem>
+<simpara>
+        Helper programs to interact with remote repositories.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitsubmodules(7)" />
+</term>
+<listitem>
+<simpara>
+        Mounting one repository inside another.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gittutorial(7)" />
+</term>
+<listitem>
+<simpara>
+        A tutorial introduction to Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gittutorial-2(7)" />
+</term>
+<listitem>
+<simpara>
+        A tutorial introduction to Git: part two.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitworkflows(7)" />
+</term>
+<listitem>
+<simpara>
+        An overview of recommended workflows with Git.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git(1)__repository_command_and_file_interfaces">
+<title>Repository, command and file interfaces</title>
+<simpara>This documentation discusses repository and command interfaces which
+users are expected to interact with directly. See <emphasis>--user-formats</emphasis> in
+<xref linkend="git-help(1)" /> for more details on the criteria.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="gitattributes(5)" />
+</term>
+<listitem>
+<simpara>
+        Defining attributes per path.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitcli(7)" />
+</term>
+<listitem>
+<simpara>
+        Git command-line interface and conventions.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="githooks(5)" />
+</term>
+<listitem>
+<simpara>
+        Hooks used by Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitignore(5)" />
+</term>
+<listitem>
+<simpara>
+        Specifies intentionally untracked files to ignore.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitmailmap(5)" />
+</term>
+<listitem>
+<simpara>
+        Map author/committer names and/or E-Mail addresses.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitmodules(5)" />
+</term>
+<listitem>
+<simpara>
+        Defining submodule properties.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitrepository-layout(5)" />
+</term>
+<listitem>
+<simpara>
+        Git Repository Layout.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitrevisions(7)" />
+</term>
+<listitem>
+<simpara>
+        Specifying revisions and ranges for Git.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git(1)__file_formats_protocols_and_other_developer_interfaces">
+<title>File formats, protocols and other developer interfaces</title>
+<simpara>This documentation discusses file formats, over-the-wire protocols and
+other git developer interfaces. See <emphasis>--developer-interfaces</emphasis> in
+<xref linkend="git-help(1)" />.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<xref linkend="gitformat-bundle(5)" />
+</term>
+<listitem>
+<simpara>
+        The bundle file format.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitformat-chunk(5)" />
+</term>
+<listitem>
+<simpara>
+        Chunk-based file formats.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitformat-commit-graph(5)" />
+</term>
+<listitem>
+<simpara>
+        Git commit-graph format.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitformat-index(5)" />
+</term>
+<listitem>
+<simpara>
+        Git index format.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitformat-pack(5)" />
+</term>
+<listitem>
+<simpara>
+        Git pack format.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitformat-signature(5)" />
+</term>
+<listitem>
+<simpara>
+        Git cryptographic signature formats.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitprotocol-capabilities(5)" />
+</term>
+<listitem>
+<simpara>
+        Protocol v0 and v1 capabilities.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitprotocol-common(5)" />
+</term>
+<listitem>
+<simpara>
+        Things common to various protocols.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitprotocol-http(5)" />
+</term>
+<listitem>
+<simpara>
+        Git HTTP-based protocols.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitprotocol-pack(5)" />
+</term>
+<listitem>
+<simpara>
+        How packs are transferred over-the-wire.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<xref linkend="gitprotocol-v2(5)" />
+</term>
+<listitem>
+<simpara>
+        Git Wire Protocol, Version 2.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git(1)__configuration_mechanism">
+<title>Configuration Mechanism</title>
+<simpara>Git uses a simple text format to store customizations that are per
+repository and are per user.  Such a configuration file may look
+like this:</simpara>
+<screen>#
+# A '#' or ';' character indicates a comment.
+#
+
+; core variables
+[core]
+        ; Don't trust file modes
+        filemode = false
+
+; user identity
+[user]
+        name = "Junio C Hamano"
+        email = "gitster@pobox.com"</screen>
+<simpara>Various commands read from the configuration file and adjust
+their operation accordingly.  See <xref linkend="git-config(1)" /> for a
+list and more details about the configuration mechanism.</simpara>
+</simplesect>
+<simplesect id="git(1)__identifier_terminology">
+<title>Identifier Terminology</title>
+<variablelist>
+<varlistentry>
+<term>
+&lt;object&gt;
+</term>
+<listitem>
+<simpara>
+        Indicates the object name for any type of object.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;blob&gt;
+</term>
+<listitem>
+<simpara>
+        Indicates a blob object name.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;tree&gt;
+</term>
+<listitem>
+<simpara>
+        Indicates a tree object name.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;commit&gt;
+</term>
+<listitem>
+<simpara>
+        Indicates a commit object name.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;tree-ish&gt;
+</term>
+<listitem>
+<simpara>
+        Indicates a tree, commit or tag object name.  A
+        command that takes a &lt;tree-ish&gt; argument ultimately wants to
+        operate on a &lt;tree&gt; object but automatically dereferences
+        &lt;commit&gt; and &lt;tag&gt; objects that point at a &lt;tree&gt;.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;commit-ish&gt;
+</term>
+<listitem>
+<simpara>
+        Indicates a commit or tag object name.  A
+        command that takes a &lt;commit-ish&gt; argument ultimately wants to
+        operate on a &lt;commit&gt; object but automatically dereferences
+        &lt;tag&gt; objects that point at a &lt;commit&gt;.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;type&gt;
+</term>
+<listitem>
+<simpara>
+        Indicates that an object type is required.
+        Currently one of: <emphasis>blob</emphasis>, <emphasis>tree</emphasis>, <emphasis>commit</emphasis>, or <emphasis>tag</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        Indicates a filename - almost always relative to the
+        root of the tree structure <emphasis>GIT_INDEX_FILE</emphasis> describes.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git(1)__symbolic_identifiers">
+<title>Symbolic Identifiers</title>
+<simpara>Any Git command accepting any &lt;object&gt; can also use the following
+symbolic notation:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+HEAD
+</term>
+<listitem>
+<simpara>
+        indicates the head of the current branch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;tag&gt;
+</term>
+<listitem>
+<simpara>
+        a valid tag <emphasis>name</emphasis>
+        (i.e. a <emphasis>refs/tags/&lt;tag&gt;</emphasis> reference).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;head&gt;
+</term>
+<listitem>
+<simpara>
+        a valid head <emphasis>name</emphasis>
+        (i.e. a <emphasis>refs/heads/&lt;head&gt;</emphasis> reference).
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>For a more complete list of ways to spell object names, see
+"SPECIFYING REVISIONS" section in <xref linkend="gitrevisions(7)" />.</simpara>
+</simplesect>
+<simplesect id="git(1)__file_directory_structure">
+<title>File/Directory Structure</title>
+<simpara>Please see the <xref linkend="gitrepository-layout(5)" /> document.</simpara>
+<simpara>Read <xref linkend="githooks(5)" /> for more details about each hook.</simpara>
+<simpara>Higher level SCMs may provide and manage additional information in the
+<emphasis>$GIT_DIR</emphasis>.</simpara>
+</simplesect>
+<simplesect id="git(1)__terminology">
+<title>Terminology</title>
+<simpara>Please see <xref linkend="gitglossary(7)" />.</simpara>
+</simplesect>
+<simplesect id="git(1)__environment_variables">
+<title>Environment Variables</title>
+<simpara>Various Git commands pay attention to environment variables and change
+their behavior.  The environment variables marked as "Boolean" take
+their values the same way as Boolean valued configuration variables, i.e.,
+"true", "yes", "on" and positive numbers are taken as "yes", while "false",
+"no", "off", and "0" are taken as "no".</simpara>
+<simpara>Here are the variables:</simpara>
+<section id="git(1)__system">
+<title>System</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>HOME</emphasis>
+</term>
+<listitem>
+<simpara>
+        Specifies the path to the user's home directory. On Windows, if
+        unset, Git will set a process environment variable equal to:
+        <emphasis>$HOMEDRIVE$HOMEPATH</emphasis> if both <emphasis>$HOMEDRIVE</emphasis> and <emphasis>$HOMEPATH</emphasis> exist;
+        otherwise <emphasis>$USERPROFILE</emphasis> if <emphasis>$USERPROFILE</emphasis> exists.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="git(1)__the_git_repository">
+<title>The Git Repository</title>
+<simpara>These environment variables apply to <emphasis>all</emphasis> core Git commands. Nb: it
+is worth noting that they may be used/overridden by SCMS sitting above
+Git so take care if using a foreign front-end.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>GIT_INDEX_FILE</emphasis>
+</term>
+<listitem>
+<simpara>
+        This environment variable specifies an alternate
+        index file. If not specified, the default of <emphasis>$GIT_DIR/index</emphasis>
+        is used.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_INDEX_VERSION</emphasis>
+</term>
+<listitem>
+<simpara>
+        This environment variable specifies what index version is used
+        when writing the index file out.  It won't affect existing index
+        files.  By default index file version 2 or 3 is used. See
+        <xref linkend="git-update-index(1)" /> for more information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_OBJECT_DIRECTORY</emphasis>
+</term>
+<listitem>
+<simpara>
+        If the object storage directory is specified via this
+        environment variable then the sha1 directories are created
+        underneath - otherwise the default <emphasis>$GIT_DIR/objects</emphasis>
+        directory is used.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_ALTERNATE_OBJECT_DIRECTORIES</emphasis>
+</term>
+<listitem>
+<simpara>
+        Due to the immutable nature of Git objects, old objects can be
+        archived into shared, read-only directories. This variable
+        specifies a ":" separated (on Windows ";" separated) list
+        of Git object directories which can be used to search for Git
+        objects. New objects will not be written to these directories.
+</simpara>
+<simpara>Entries that begin with <emphasis>"</emphasis> (double-quote) will be interpreted
+as C-style quoted paths, removing leading and trailing
+double-quotes and respecting backslash escapes. E.g., the value
+<emphasis>"path-with-\"-and-:-in-it":vanilla-path</emphasis> has two paths:
+<emphasis>path-with-"-and-:-in-it</emphasis> and <emphasis>vanilla-path</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_DIR</emphasis>
+</term>
+<listitem>
+<simpara>
+        If the <emphasis>GIT_DIR</emphasis> environment variable is set then it
+        specifies a path to use instead of the default <emphasis>.git</emphasis>
+        for the base of the repository.
+        The <emphasis>--git-dir</emphasis> command-line option also sets this value.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_WORK_TREE</emphasis>
+</term>
+<listitem>
+<simpara>
+        Set the path to the root of the working tree.
+        This can also be controlled by the <emphasis>--work-tree</emphasis> command-line
+        option and the core.worktree configuration variable.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_NAMESPACE</emphasis>
+</term>
+<listitem>
+<simpara>
+        Set the Git namespace; see <xref linkend="gitnamespaces(7)" /> for details.
+        The <emphasis>--namespace</emphasis> command-line option also sets this value.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_CEILING_DIRECTORIES</emphasis>
+</term>
+<listitem>
+<simpara>
+        This should be a colon-separated list of absolute paths.  If
+        set, it is a list of directories that Git should not chdir up
+        into while looking for a repository directory (useful for
+        excluding slow-loading network directories).  It will not
+        exclude the current working directory or a GIT_DIR set on the
+        command line or in the environment.  Normally, Git has to read
+        the entries in this list and resolve any symlink that
+        might be present in order to compare them with the current
+        directory.  However, if even this access is slow, you
+        can add an empty entry to the list to tell Git that the
+        subsequent entries are not symlinks and needn't be resolved;
+        e.g.,
+        <emphasis>GIT_CEILING_DIRECTORIES=/maybe/symlink::/very/slow/non/symlink</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_DISCOVERY_ACROSS_FILESYSTEM</emphasis>
+</term>
+<listitem>
+<simpara>
+        When run in a directory that does not have ".git" repository
+        directory, Git tries to find such a directory in the parent
+        directories to find the top of the working tree, but by default it
+        does not cross filesystem boundaries.  This Boolean environment variable
+        can be set to true to tell Git not to stop at filesystem
+        boundaries.  Like <emphasis>GIT_CEILING_DIRECTORIES</emphasis>, this will not affect
+        an explicit repository directory set via <emphasis>GIT_DIR</emphasis> or on the
+        command line.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_COMMON_DIR</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this variable is set to a path, non-worktree files that are
+        normally in $GIT_DIR will be taken from this path
+        instead. Worktree-specific files such as HEAD or index are
+        taken from $GIT_DIR. See <xref linkend="gitrepository-layout(5)" /> and
+        <xref linkend="git-worktree(1)" /> for
+        details. This variable has lower precedence than other path
+        variables such as GIT_INDEX_FILE, GIT_OBJECT_DIRECTORY&#8230;
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_DEFAULT_HASH</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this variable is set, the default hash algorithm for new
+        repositories will be set to this value. This value is
+        ignored when cloning and the setting of the remote repository
+        is always used. The default is "sha1".
+        See <emphasis>--object-format</emphasis> in <xref linkend="git-init(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_DEFAULT_REF_FORMAT</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this variable is set, the default reference backend format for new
+        repositories will be set to this value. The default is "files".
+        See <emphasis>--ref-format</emphasis> in <xref linkend="git-init(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="git(1)__git_commits">
+<title>Git Commits</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>GIT_AUTHOR_NAME</emphasis>
+</term>
+<listitem>
+<simpara>
+        The human-readable name used in the author identity when creating commit or
+        tag objects, or when writing reflogs. Overrides the <emphasis>user.name</emphasis> and
+        <emphasis>author.name</emphasis> configuration settings.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_AUTHOR_EMAIL</emphasis>
+</term>
+<listitem>
+<simpara>
+        The email address used in the author identity when creating commit or
+        tag objects, or when writing reflogs. Overrides the <emphasis>user.email</emphasis> and
+        <emphasis>author.email</emphasis> configuration settings.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_AUTHOR_DATE</emphasis>
+</term>
+<listitem>
+<simpara>
+        The date used for the author identity when creating commit or tag objects, or
+        when writing reflogs. See <xref linkend="git-commit(1)" /> for valid formats.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_COMMITTER_NAME</emphasis>
+</term>
+<listitem>
+<simpara>
+        The human-readable name used in the committer identity when creating commit or
+        tag objects, or when writing reflogs. Overrides the <emphasis>user.name</emphasis> and
+        <emphasis>committer.name</emphasis> configuration settings.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_COMMITTER_EMAIL</emphasis>
+</term>
+<listitem>
+<simpara>
+        The email address used in the author identity when creating commit or
+        tag objects, or when writing reflogs. Overrides the <emphasis>user.email</emphasis> and
+        <emphasis>committer.email</emphasis> configuration settings.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_COMMITTER_DATE</emphasis>
+</term>
+<listitem>
+<simpara>
+        The date used for the committer identity when creating commit or tag objects, or
+        when writing reflogs. See <xref linkend="git-commit(1)" /> for valid formats.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>EMAIL</emphasis>
+</term>
+<listitem>
+<simpara>
+        The email address used in the author and committer identities if no other
+        relevant environment variable or configuration setting has been set.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="git(1)__git_diffs">
+<title>Git Diffs</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>GIT_DIFF_OPTS</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only valid setting is "--unified=??" or "-u??" to set the
+        number of context lines shown when a unified diff is created.
+        This takes precedence over any "-U" or "--unified" option
+        value passed on the Git diff command line.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_EXTERNAL_DIFF</emphasis>
+</term>
+<listitem>
+<simpara>
+        When the environment variable <emphasis>GIT_EXTERNAL_DIFF</emphasis> is set, the
+        program named by it is called to generate diffs, and Git
+        does not use its builtin diff machinery.
+        For a path that is added, removed, or modified,
+        <emphasis>GIT_EXTERNAL_DIFF</emphasis> is called with 7 parameters:
+</simpara>
+<literallayout class="monospaced">path old-file old-hex old-mode new-file new-hex new-mode</literallayout>
+<simpara>where:</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;old|new&gt;-file
+</term>
+<listitem>
+<simpara>
+are files GIT_EXTERNAL_DIFF can use to read the
+                         contents of &lt;old|new&gt;,
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;old|new&gt;-hex
+</term>
+<listitem>
+<simpara>
+are the 40-hexdigit SHA-1 hashes,
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;old|new&gt;-mode
+</term>
+<listitem>
+<simpara>
+are the octal representation of the file modes.
+</simpara>
+<simpara>The file parameters can point at the user's working file
+(e.g. <emphasis>new-file</emphasis> in "git-diff-files"), <emphasis>/dev/null</emphasis> (e.g. <emphasis>old-file</emphasis>
+when a new file is added), or a temporary file (e.g. <emphasis>old-file</emphasis> in the
+index).  <emphasis>GIT_EXTERNAL_DIFF</emphasis> should not worry about unlinking the
+temporary file -- it is removed when <emphasis>GIT_EXTERNAL_DIFF</emphasis> exits.</simpara>
+<simpara>For a path that is unmerged, <emphasis>GIT_EXTERNAL_DIFF</emphasis> is called with 1
+parameter, &lt;path&gt;.</simpara>
+<simpara>For each path <emphasis>GIT_EXTERNAL_DIFF</emphasis> is called, two environment variables,
+<emphasis>GIT_DIFF_PATH_COUNTER</emphasis> and <emphasis>GIT_DIFF_PATH_TOTAL</emphasis> are set.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_EXTERNAL_DIFF_TRUST_EXIT_CODE</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this Boolean environment variable is set to true then the
+        <emphasis>GIT_EXTERNAL_DIFF</emphasis> command is expected to return exit code
+        0 if it considers the input files to be equal or 1 if it
+        considers them to be different, like <emphasis>diff(1)</emphasis>.
+        If it is set to false, which is the default, then the command
+        is expected to return exit code 0 regardless of equality.
+        Any other exit code causes Git to report a fatal error.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_DIFF_PATH_COUNTER</emphasis>
+</term>
+<listitem>
+<simpara>
+        A 1-based counter incremented by one for every path.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_DIFF_PATH_TOTAL</emphasis>
+</term>
+<listitem>
+<simpara>
+        The total number of paths.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="git(1)__other">
+<title>other</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>GIT_MERGE_VERBOSITY</emphasis>
+</term>
+<listitem>
+<simpara>
+        A number controlling the amount of output shown by
+        the recursive merge strategy.  Overrides merge.verbosity.
+        See <xref linkend="git-merge(1)" />
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_PAGER</emphasis>
+</term>
+<listitem>
+<simpara>
+        This environment variable overrides <emphasis>$PAGER</emphasis>. If it is set
+        to an empty string or to the value "cat", Git will not launch
+        a pager.  See also the <emphasis>core.pager</emphasis> option in
+        <xref linkend="git-config(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_PROGRESS_DELAY</emphasis>
+</term>
+<listitem>
+<simpara>
+        A number controlling how many seconds to delay before showing
+        optional progress indicators. Defaults to 1.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_EDITOR</emphasis>
+</term>
+<listitem>
+<simpara>
+        This environment variable overrides <emphasis>$EDITOR</emphasis> and <emphasis>$VISUAL</emphasis>.
+        It is used by several Git commands when, on interactive mode,
+        an editor is to be launched. See also <xref linkend="git-var(1)" />
+        and the <emphasis>core.editor</emphasis> option in <xref linkend="git-config(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_SEQUENCE_EDITOR</emphasis>
+</term>
+<listitem>
+<simpara>
+        This environment variable overrides the configured Git editor
+        when editing the todo list of an interactive rebase. See also
+        <xref linkend="git-rebase(1)" /> and the <emphasis>sequence.editor</emphasis> option in
+        <xref linkend="git-config(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_SSH</emphasis>
+</term>
+<term>
+<emphasis>GIT_SSH_COMMAND</emphasis>
+</term>
+<listitem>
+<simpara>
+        If either of these environment variables is set then <emphasis>git fetch</emphasis>
+        and <emphasis>git push</emphasis> will use the specified command instead of <emphasis>ssh</emphasis>
+        when they need to connect to a remote system.
+        The command-line parameters passed to the configured command are
+        determined by the ssh variant.  See <emphasis>ssh.variant</emphasis> option in
+        <xref linkend="git-config(1)" /> for details.
+</simpara>
+<simpara><emphasis>$GIT_SSH_COMMAND</emphasis> takes precedence over <emphasis>$GIT_SSH</emphasis>, and is interpreted
+by the shell, which allows additional arguments to be included.
+<emphasis>$GIT_SSH</emphasis> on the other hand must be just the path to a program
+(which can be a wrapper shell script, if additional arguments are
+needed).</simpara>
+<simpara>Usually it is easier to configure any desired options through your
+personal <emphasis>.ssh/config</emphasis> file.  Please consult your ssh documentation
+for further details.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_SSH_VARIANT</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this environment variable is set, it overrides Git's autodetection
+        whether <emphasis>GIT_SSH</emphasis>/<emphasis>GIT_SSH_COMMAND</emphasis>/<emphasis>core.sshCommand</emphasis> refer to OpenSSH,
+        plink or tortoiseplink. This variable overrides the config setting
+        <emphasis>ssh.variant</emphasis> that serves the same purpose.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_SSL_NO_VERIFY</emphasis>
+</term>
+<listitem>
+<simpara>
+        Setting and exporting this environment variable to any value
+        tells Git not to verify the SSL certificate when fetching or
+        pushing over HTTPS.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_ATTR_SOURCE</emphasis>
+</term>
+<listitem>
+<simpara>
+        Sets the treeish that gitattributes will be read from.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_ASKPASS</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this environment variable is set, then Git commands which need to
+        acquire passwords or passphrases (e.g. for HTTP or IMAP authentication)
+        will call this program with a suitable prompt as command-line argument
+        and read the password from its STDOUT. See also the <emphasis>core.askPass</emphasis>
+        option in <xref linkend="git-config(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TERMINAL_PROMPT</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this Boolean environment variable is set to false, git will not prompt
+        on the terminal (e.g., when asking for HTTP authentication).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_CONFIG_GLOBAL</emphasis>
+</term>
+<term>
+<emphasis>GIT_CONFIG_SYSTEM</emphasis>
+</term>
+<listitem>
+<simpara>
+        Take the configuration from the given files instead from global or
+        system-level configuration files. If <emphasis>GIT_CONFIG_SYSTEM</emphasis> is set, the
+        system config file defined at build time (usually <emphasis>/etc/gitconfig</emphasis>)
+        will not be read. Likewise, if <emphasis>GIT_CONFIG_GLOBAL</emphasis> is set, neither
+        <emphasis>$HOME/.gitconfig</emphasis> nor <emphasis>$XDG_CONFIG_HOME/git/config</emphasis> will be read. Can
+        be set to <emphasis>/dev/null</emphasis> to skip reading configuration files of the
+        respective level.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_CONFIG_NOSYSTEM</emphasis>
+</term>
+<listitem>
+<simpara>
+        Whether to skip reading settings from the system-wide
+        <emphasis>$(prefix)/etc/gitconfig</emphasis> file.  This Boolean environment variable can
+        be used along with <emphasis>$HOME</emphasis> and <emphasis>$XDG_CONFIG_HOME</emphasis> to create a
+        predictable environment for a picky script, or you can set it
+        to true to temporarily avoid using a buggy <emphasis>/etc/gitconfig</emphasis> file while
+        waiting for someone with sufficient permissions to fix it.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_FLUSH</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this Boolean environment variable is set to true, then commands such
+        as <emphasis>git blame</emphasis> (in incremental mode), <emphasis>git rev-list</emphasis>, <emphasis>git log</emphasis>,
+        <emphasis>git check-attr</emphasis> and <emphasis>git check-ignore</emphasis> will
+        force a flush of the output stream after each record have been
+        flushed. If this
+        variable is set to false, the output of these commands will be done
+        using completely buffered I/O.   If this environment variable is
+        not set, Git will choose buffered or record-oriented flushing
+        based on whether stdout appears to be redirected to a file or not.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables general trace messages, e.g. alias expansion, built-in
+        command execution and external command execution.
+</simpara>
+<simpara>If this variable is set to "1", "2" or "true" (comparison
+is case insensitive), trace messages will be printed to
+stderr.</simpara>
+<simpara>If the variable is set to an integer value greater than 2
+and lower than 10 (strictly) then Git will interpret this
+value as an open file descriptor and will try to write the
+trace messages into this file descriptor.</simpara>
+<simpara>Alternatively, if the variable is set to an absolute path
+(starting with a <emphasis>/</emphasis> character), Git will interpret this
+as a file path and will try to append the trace messages
+to it.</simpara>
+<simpara>Unsetting the variable, or setting it to empty, "0" or
+"false" (case insensitive) disables trace messages.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_FSMONITOR</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables trace messages for the filesystem monitor extension.
+        See <emphasis>GIT_TRACE</emphasis> for available trace output options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_PACK_ACCESS</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables trace messages for all accesses to any packs. For each
+        access, the pack file name and an offset in the pack is
+        recorded. This may be helpful for troubleshooting some
+        pack-related performance problems.
+        See <emphasis>GIT_TRACE</emphasis> for available trace output options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_PACKET</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables trace messages for all packets coming in or out of a
+        given program. This can help with debugging object negotiation
+        or other protocol issues. Tracing is turned off at a packet
+        starting with "PACK" (but see <emphasis>GIT_TRACE_PACKFILE</emphasis> below).
+        See <emphasis>GIT_TRACE</emphasis> for available trace output options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_PACKFILE</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables tracing of packfiles sent or received by a
+        given program. Unlike other trace output, this trace is
+        verbatim: no headers, and no quoting of binary data. You almost
+        certainly want to direct into a file (e.g.,
+        <emphasis>GIT_TRACE_PACKFILE=/tmp/my.pack</emphasis>) rather than displaying it on
+        the terminal or mixing it with other trace output.
+</simpara>
+<simpara>Note that this is currently only implemented for the client side
+of clones and fetches.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_PERFORMANCE</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables performance related trace messages, e.g. total execution
+        time of each Git command.
+        See <emphasis>GIT_TRACE</emphasis> for available trace output options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_REFS</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables trace messages for operations on the ref database.
+        See <emphasis>GIT_TRACE</emphasis> for available trace output options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_SETUP</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables trace messages printing the .git, working tree and current
+        working directory after Git has completed its setup phase.
+        See <emphasis>GIT_TRACE</emphasis> for available trace output options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_SHALLOW</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables trace messages that can help debugging fetching /
+        cloning of shallow repositories.
+        See <emphasis>GIT_TRACE</emphasis> for available trace output options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_CURL</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables a curl full trace dump of all incoming and outgoing data,
+        including descriptive information, of the git transport protocol.
+        This is similar to doing curl <emphasis>--trace-ascii</emphasis> on the command line.
+        See <emphasis>GIT_TRACE</emphasis> for available trace output options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_CURL_NO_DATA</emphasis>
+</term>
+<listitem>
+<simpara>
+        When a curl trace is enabled (see <emphasis>GIT_TRACE_CURL</emphasis> above), do not dump
+        data (that is, only dump info lines and headers).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE2</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enables more detailed trace messages from the "trace2" library.
+        Output from <emphasis>GIT_TRACE2</emphasis> is a simple text-based format for human
+        readability.
+</simpara>
+<simpara>If this variable is set to "1", "2" or "true" (comparison
+is case insensitive), trace messages will be printed to
+stderr.</simpara>
+<simpara>If the variable is set to an integer value greater than 2
+and lower than 10 (strictly) then Git will interpret this
+value as an open file descriptor and will try to write the
+trace messages into this file descriptor.</simpara>
+<simpara>Alternatively, if the variable is set to an absolute path
+(starting with a <emphasis>/</emphasis> character), Git will interpret this
+as a file path and will try to append the trace messages
+to it.  If the path already exists and is a directory, the
+trace messages will be written to files (one per process)
+in that directory, named according to the last component
+of the SID and an optional counter (to avoid filename
+collisions).</simpara>
+<simpara>In addition, if the variable is set to
+<emphasis>af_unix:[&lt;socket-type&gt;:]&lt;absolute-pathname&gt;</emphasis>, Git will try
+to open the path as a Unix Domain Socket.  The socket type
+can be either <emphasis>stream</emphasis> or <emphasis>dgram</emphasis>.</simpara>
+<simpara>Unsetting the variable, or setting it to empty, "0" or
+"false" (case insensitive) disables trace messages.</simpara>
+<simpara>See <ulink url="https://www.kernel.org/pub/software/scm/git/docs/technical/api-trace2.html"><citetitle>Trace2 documentation</citetitle></ulink>
+for full details.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE2_EVENT</emphasis>
+</term>
+<listitem>
+<simpara>
+        This setting writes a JSON-based format that is suited for machine
+        interpretation.
+        See <emphasis>GIT_TRACE2</emphasis> for available trace output options and
+        <ulink url="https://www.kernel.org/pub/software/scm/git/docs/technical/api-trace2.html"><citetitle>Trace2 documentation</citetitle></ulink> for full details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE2_PERF</emphasis>
+</term>
+<listitem>
+<simpara>
+        In addition to the text-based messages available in <emphasis>GIT_TRACE2</emphasis>, this
+        setting writes a column-based format for understanding nesting
+        regions.
+        See <emphasis>GIT_TRACE2</emphasis> for available trace output options and
+        <ulink url="https://www.kernel.org/pub/software/scm/git/docs/technical/api-trace2.html"><citetitle>Trace2 documentation</citetitle></ulink> for full details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_TRACE_REDACT</emphasis>
+</term>
+<listitem>
+<simpara>
+        By default, when tracing is activated, Git redacts the values of
+        cookies, the "Authorization:" header, the "Proxy-Authorization:"
+        header and packfile URIs. Set this Boolean environment variable to false to prevent this
+        redaction.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_NO_REPLACE_OBJECTS</emphasis>
+</term>
+<listitem>
+<simpara>
+        Setting and exporting this environment variable tells Git to
+        ignore replacement refs and do not replace Git objects.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_LITERAL_PATHSPECS</emphasis>
+</term>
+<listitem>
+<simpara>
+        Setting this Boolean environment variable to true will cause Git to treat all
+        pathspecs literally, rather than as glob patterns. For example,
+        running <emphasis>GIT_LITERAL_PATHSPECS=1 git log -- '*.c'</emphasis> will search
+        for commits that touch the path <emphasis>*.c</emphasis>, not any paths that the
+        glob <emphasis>*.c</emphasis> matches. You might want this if you are feeding
+        literal paths to Git (e.g., paths previously given to you by
+        <emphasis>git ls-tree</emphasis>, <emphasis>--raw</emphasis> diff output, etc).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_GLOB_PATHSPECS</emphasis>
+</term>
+<listitem>
+<simpara>
+        Setting this Boolean environment variable to true will cause Git to treat all
+        pathspecs as glob patterns (aka "glob" magic).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_NOGLOB_PATHSPECS</emphasis>
+</term>
+<listitem>
+<simpara>
+        Setting this Boolean environment variable to true will cause Git to treat all
+        pathspecs as literal (aka "literal" magic).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_ICASE_PATHSPECS</emphasis>
+</term>
+<listitem>
+<simpara>
+        Setting this Boolean environment variable to true will cause Git to treat all
+        pathspecs as case-insensitive.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_NO_LAZY_FETCH</emphasis>
+</term>
+<listitem>
+<simpara>
+        Setting this Boolean environment variable to true tells Git
+        not to lazily fetch missing objects from the promisor remote
+        on demand.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_REFLOG_ACTION</emphasis>
+</term>
+<listitem>
+<simpara>
+        When a ref is updated, reflog entries are created to keep
+        track of the reason why the ref was updated (which is
+        typically the name of the high-level command that updated
+        the ref), in addition to the old and new values of the ref.
+        A scripted Porcelain command can use set_reflog_action
+        helper function in <emphasis>git-sh-setup</emphasis> to set its name to this
+        variable when it is invoked as the top level command by the
+        end user, to be recorded in the body of the reflog.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_REF_PARANOIA</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this Boolean environment variable is set to false, ignore broken or badly named refs when iterating
+        over lists of refs. Normally Git will try to include any such
+        refs, which may cause some operations to fail. This is usually
+        preferable, as potentially destructive operations (e.g.,
+        <xref linkend="git-prune(1)" />) are better off aborting rather than
+        ignoring broken refs (and thus considering the history they
+        point to as not worth saving). The default value is <emphasis>1</emphasis> (i.e.,
+        be paranoid about detecting and aborting all operations). You
+        should not normally need to set this to <emphasis>0</emphasis>, but it may be
+        useful when trying to salvage data from a corrupted repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_COMMIT_GRAPH_PARANOIA</emphasis>
+</term>
+<listitem>
+<simpara>
+        When loading a commit object from the commit-graph, Git performs an
+        existence check on the object in the object database. This is done to
+        avoid issues with stale commit-graphs that contain references to
+        already-deleted commits, but comes with a performance penalty.
+</simpara>
+<simpara>The default is "false", which disables the aforementioned behavior.
+Setting this to "true" enables the existence check so that stale commits
+will never be returned from the commit-graph at the cost of performance.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_ALLOW_PROTOCOL</emphasis>
+</term>
+<listitem>
+<simpara>
+        If set to a colon-separated list of protocols, behave as if
+        <emphasis>protocol.allow</emphasis> is set to <emphasis>never</emphasis>, and each of the listed
+        protocols has <emphasis>protocol.&lt;name&gt;.allow</emphasis> set to <emphasis>always</emphasis>
+        (overriding any existing configuration). See the description of
+        <emphasis>protocol.allow</emphasis> in <xref linkend="git-config(1)" /> for more details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_PROTOCOL_FROM_USER</emphasis>
+</term>
+<listitem>
+<simpara>
+        Set this Boolean environment variable to false to prevent protocols used by fetch/push/clone which are
+        configured to the <emphasis>user</emphasis> state.  This is useful to restrict recursive
+        submodule initialization from an untrusted repository or for programs
+        which feed potentially-untrusted URLS to git commands.  See
+        <xref linkend="git-config(1)" /> for more details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_PROTOCOL</emphasis>
+</term>
+<listitem>
+<simpara>
+        For internal use only.  Used in handshaking the wire protocol.
+        Contains a colon <emphasis>:</emphasis> separated list of keys with optional values
+        <emphasis>&lt;key&gt;[=&lt;value&gt;]</emphasis>.  Presence of unknown keys and values must be
+        ignored.
+</simpara>
+<simpara>Note that servers may need to be configured to allow this variable to
+pass over some transports. It will be propagated automatically when
+accessing local repositories (i.e., <emphasis>file://</emphasis> or a filesystem path), as
+well as over the <emphasis>git://</emphasis> protocol. For git-over-http, it should work
+automatically in most configurations, but see the discussion in
+<xref linkend="git-http-backend(1)" />. For git-over-ssh, the ssh server may need
+to be configured to allow clients to pass this variable (e.g., by using
+<emphasis>AcceptEnv GIT_PROTOCOL</emphasis> with OpenSSH).</simpara>
+<simpara>This configuration is optional. If the variable is not propagated, then
+clients will fall back to the original "v0" protocol (but may miss out
+on some performance improvements or features). This variable currently
+only affects clones and fetches; it is not yet used for pushes (but may
+be in the future).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_OPTIONAL_LOCKS</emphasis>
+</term>
+<listitem>
+<simpara>
+        If this Boolean environment variable is set to false, Git will complete any requested operation without
+        performing any optional sub-operations that require taking a lock.
+        For example, this will prevent <emphasis>git status</emphasis> from refreshing the
+        index as a side effect. This is useful for processes running in
+        the background which do not want to cause lock contention with
+        other operations on the repository.  Defaults to <emphasis>1</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_REDIRECT_STDIN</emphasis>
+</term>
+<term>
+<emphasis>GIT_REDIRECT_STDOUT</emphasis>
+</term>
+<term>
+<emphasis>GIT_REDIRECT_STDERR</emphasis>
+</term>
+<listitem>
+<simpara>
+        Windows-only: allow redirecting the standard input/output/error
+        handles to paths specified by the environment variables. This is
+        particularly useful in multi-threaded applications where the
+        canonical way to pass standard handles via <emphasis>CreateProcess()</emphasis> is
+        not an option because it would require the handles to be marked
+        inheritable (and consequently <emphasis role="strong">every</emphasis> spawned process would
+        inherit them, possibly blocking regular Git operations). The
+        primary intended use case is to use named pipes for communication
+        (e.g. <emphasis>\\.\pipe\my-git-stdin-123</emphasis>).
+</simpara>
+<simpara>Two special values are supported: <emphasis>off</emphasis> will simply close the
+corresponding standard handle, and if <emphasis>GIT_REDIRECT_STDERR</emphasis> is
+<emphasis>2&gt;&amp;1</emphasis>, standard error will be redirected to the same handle as
+standard output.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_PRINT_SHA1_ELLIPSIS</emphasis> (deprecated)
+</term>
+<listitem>
+<simpara>
+        If set to <emphasis>yes</emphasis>, print an ellipsis following an
+        (abbreviated) SHA-1 value.  This affects indications of
+        detached HEADs (<xref linkend="git-checkout(1)" />) and the raw
+        diff output (<xref linkend="git-diff(1)" />).  Printing an
+        ellipsis in the cases mentioned is no longer considered
+        adequate and support for it is likely to be removed in the
+        foreseeable future (along with the variable).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_ADVICE</emphasis>
+</term>
+<listitem>
+<simpara>
+        If set to <emphasis>0</emphasis>, then disable all advice messages. These messages are
+        intended to provide hints to human users that may help them get out of
+        problematic situations or take advantage of new features. Users can
+        disable individual messages using the <emphasis>advice.*</emphasis> config keys. These
+        messages may be disruptive to tools that execute Git processes, so this
+        variable is available to disable the messages. (The <emphasis>--no-advice</emphasis>
+        global option is also available, but old Git versions may fail when
+        this option is not understood. The environment variable will be ignored
+        by Git versions that do not understand it.)
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+</simplesect>
+<simplesect id="git(1)__discussion_anchor_id_git_1__discussion_xreflabel_discussion">
+<title>Discussion<anchor id="git(1)_Discussion" xreflabel="[Discussion]"/></title>
+<simpara>More detail on the following is available from the
+<link linkend="user-manual_git-concepts">Git concepts chapter of the
+user-manual</link> and <xref linkend="gitcore-tutorial(7)" />.</simpara>
+<simpara>A Git project normally consists of a working directory with a ".git"
+subdirectory at the top level.  The .git directory contains, among other
+things, a compressed object database representing the complete history
+of the project, an "index" file which links that history to the current
+contents of the working tree, and named pointers into that history such
+as tags and branch heads.</simpara>
+<simpara>The object database contains objects of three main types: blobs, which
+hold file data; trees, which point to blobs and other trees to build up
+directory hierarchies; and commits, which each reference a single tree
+and some number of parent commits.</simpara>
+<simpara>The commit, equivalent to what other systems call a "changeset" or
+"version", represents a step in the project's history, and each parent
+represents an immediately preceding step.  Commits with more than one
+parent represent merges of independent lines of development.</simpara>
+<simpara>All objects are named by the SHA-1 hash of their contents, normally
+written as a string of 40 hex digits.  Such names are globally unique.
+The entire history leading up to a commit can be vouched for by signing
+just that commit.  A fourth object type, the tag, is provided for this
+purpose.</simpara>
+<simpara>When first created, objects are stored in individual files, but for
+efficiency may later be compressed together into "pack files".</simpara>
+<simpara>Named pointers called refs mark interesting points in history.  A ref
+may contain the SHA-1 name of an object or the name of another ref (the
+latter is called a "symbolic ref").
+Refs with names beginning <emphasis>refs/head/</emphasis> contain the SHA-1 name of the most
+recent commit (or "head") of a branch under development.  SHA-1 names of
+tags of interest are stored under <emphasis>refs/tags/</emphasis>.  A symbolic ref named
+<emphasis>HEAD</emphasis> contains the name of the currently checked-out branch.</simpara>
+<simpara>The index file is initialized with a list of all paths and, for each
+path, a blob object and a set of attributes.  The blob object represents
+the contents of the file as of the head of the current branch.  The
+attributes (last modified time, size, etc.) are taken from the
+corresponding file in the working tree.  Subsequent changes to the
+working tree can be found by comparing these attributes.  The index may
+be updated with new content, and new commits may be created from the
+content stored in the index.</simpara>
+<simpara>The index is also capable of storing multiple entries (called "stages")
+for a given pathname.  These stages are used to hold the various
+unmerged version of a file when a merge is in progress.</simpara>
+</simplesect>
+<simplesect id="git(1)__security">
+<title>SECURITY</title>
+<simpara>Some configuration options and hook files may cause Git to run arbitrary
+shell commands. Because configuration and hooks are not copied using
+<emphasis>git clone</emphasis>, it is generally safe to clone remote repositories with
+untrusted content, inspect them with <emphasis>git log</emphasis>, and so on.</simpara>
+<simpara>However, it is not safe to run Git commands in a <emphasis>.git</emphasis> directory (or
+the working tree that surrounds it) when that <emphasis>.git</emphasis> directory itself
+comes from an untrusted source. The commands in its config and hooks
+are executed in the usual way.</simpara>
+<simpara>By default, Git will refuse to run when the repository is owned by
+someone other than the user running the command. See the entry for
+<emphasis>safe.directory</emphasis> in <xref linkend="git-config(1)" />. While this can help protect
+you in a multi-user environment, note that you can also acquire
+untrusted repositories that are owned by you (for example, if you
+extract a zip file or tarball from an untrusted source). In such cases,
+you'd need to "sanitize" the untrusted repository first.</simpara>
+<simpara>If you have an untrusted <emphasis>.git</emphasis> directory, you should first clone it
+with <emphasis>git clone --no-local</emphasis> to obtain a clean copy. Git does restrict
+the set of options and hooks that will be run by <emphasis>upload-pack</emphasis>, which
+handles the server side of a clone or fetch, but beware that the
+surface area for attack against <emphasis>upload-pack</emphasis> is large, so this does
+carry some risk. The safest thing is to serve the repository as an
+unprivileged user (either via <xref linkend="git-daemon(1)" />, ssh, or using
+other tools to change user ids). See the discussion in the <emphasis>SECURITY</emphasis>
+section of <xref linkend="git-upload-pack(1)" />.</simpara>
+</simplesect>
+<simplesect id="git(1)__further_documentation">
+<title>FURTHER DOCUMENTATION</title>
+<simpara>See the references in the "description" section to get started
+using Git.  The following is probably more detail than necessary
+for a first-time user.</simpara>
+<simpara>The <link linkend="user-manual_git-concepts">Git concepts chapter of the
+user-manual</link> and <xref linkend="gitcore-tutorial(7)" /> both provide
+introductions to the underlying Git architecture.</simpara>
+<simpara>See <xref linkend="gitworkflows(7)" /> for an overview of recommended workflows.</simpara>
+<simpara>See also the <ulink url="https://www.kernel.org/pub/software/scm/git/docs/howto-index.html"><citetitle>howto</citetitle></ulink> documents for some useful
+examples.</simpara>
+<simpara>The internals are documented in the
+<ulink url="https://www.kernel.org/pub/software/scm/git/docs/technical/api-index.html"><citetitle>Git API documentation</citetitle></ulink>.</simpara>
+<simpara>Users migrating from CVS may also want to
+read <xref linkend="gitcvs-migration(7)" />.</simpara>
+</simplesect>
+<simplesect id="git(1)__authors">
+<title>Authors</title>
+<simpara>Git was started by Linus Torvalds, and is currently maintained by Junio
+C Hamano. Numerous contributions have come from the Git mailing list
+&lt;<ulink url="mailto:git@vger.kernel.org">git@vger.kernel.org</ulink>&gt;.  <ulink url="https://openhub.net/p/git/contributors/summary">https://openhub.net/p/git/contributors/summary</ulink>
+gives you a more complete list of contributors.</simpara>
+<simpara>If you have a clone of git.git itself, the
+output of <xref linkend="git-shortlog(1)" /> and <xref linkend="git-blame(1)" /> can show you
+the authors for specific parts of the project.</simpara>
+</simplesect>
+<simplesect id="git(1)__reporting_bugs">
+<title>Reporting Bugs</title>
+<simpara>Report bugs to the Git mailing list &lt;<ulink url="mailto:git@vger.kernel.org">git@vger.kernel.org</ulink>&gt; where the
+development and maintenance is primarily done.  You do not have to be
+subscribed to the list to send a message there.  See the list archive
+at <ulink url="https://lore.kernel.org/git">https://lore.kernel.org/git</ulink> for previous bug reports and other
+discussions.</simpara>
+<simpara>Issues which are security relevant should be disclosed privately to
+the Git Security mailing list &lt;<ulink url="mailto:git-security@googlegroups.com">git-security@googlegroups.com</ulink>&gt;.</simpara>
+</simplesect>
+<simplesect id="git(1)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="gittutorial(7)" />, <xref linkend="gittutorial-2(7)" />,
+<xref linkend="giteveryday(7)" />, <xref linkend="gitcvs-migration(7)" />,
+<xref linkend="gitglossary(7)" />, <xref linkend="gitcore-tutorial(7)" />,
+<xref linkend="gitcli(7)" />, <link linkend="git_user-manual">The Git User's Manual</link>,
+<xref linkend="gitworkflows(7)" /></simpara>
+</simplesect>
+<simplesect id="git(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

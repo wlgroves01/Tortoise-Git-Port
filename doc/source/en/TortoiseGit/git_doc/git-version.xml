@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-version(1)">
+    <title>git-version(1)</title>
+<indexterm>
+<primary>git-version(1)</primary>
+</indexterm>
+<simplesect id="git-version(1)__name">
+<title>NAME</title>
+<simpara>git-version - Display version information about Git</simpara>
+</simplesect>
+<simplesect id="git-version(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><emphasis>git version</emphasis> [--build-options]</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-version(1)__description">
+<title>DESCRIPTION</title>
+<simpara>With no options given, the version of <emphasis>git</emphasis> is printed on the standard output.</simpara>
+<simpara>Note that <emphasis>git --version</emphasis> is identical to <emphasis>git version</emphasis> because the
+former is internally converted into the latter.</simpara>
+</simplesect>
+<simplesect id="git-version(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--build-options
+</term>
+<listitem>
+<simpara>
+        Include additional information about how git was built for diagnostic
+        purposes.
+</simpara>
+<simpara>The libraries used to implement the SHA-1 and SHA-256 algorithms are displayed
+in the form <emphasis>SHA-1: &lt;option&gt;</emphasis> and <emphasis>SHA-256: &lt;option&gt;</emphasis>. Note that the SHA-1
+options <emphasis>SHA1_APPLE</emphasis>, <emphasis>SHA1_OPENSSL</emphasis>, and <emphasis>SHA1_BLK</emphasis> do not use a collision
+detection algorithm and thus may be vulnerable to known SHA-1 collision
+attacks. When a faster SHA-1 implementation without collision detection is used
+for only non-cryptographic purposes, the algorithm is displayed in the form
+<emphasis>non-collision-detecting-SHA-1: &lt;option&gt;</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-version(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

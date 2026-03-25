@@ -1,0 +1,674 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="githooks(5)">
+    <title>githooks(5)</title>
+<indexterm>
+<primary>githooks(5)</primary>
+</indexterm>
+<simplesect id="githooks(5)__name">
+<title>NAME</title>
+<simpara>githooks - Hooks used by Git</simpara>
+</simplesect>
+<simplesect id="githooks(5)__synopsis">
+<title>SYNOPSIS</title>
+<simpara>$GIT_DIR/hooks/* (or `git config core.hooksPath`/*)</simpara>
+</simplesect>
+<simplesect id="githooks(5)__description">
+<title>DESCRIPTION</title>
+<simpara>Hooks are programs you can place in a hooks directory to trigger
+actions at certain points in git's execution. Hooks that don't have
+the executable bit set are ignored.</simpara>
+<simpara>By default the hooks directory is <emphasis>$GIT_DIR/hooks</emphasis>, but that can be
+changed via the <emphasis>core.hooksPath</emphasis> configuration variable (see
+<xref linkend="git-config(1)" />).</simpara>
+<simpara>Before Git invokes a hook, it changes its working directory to either
+$GIT_DIR in a bare repository or the root of the working tree in a non-bare
+repository. An exception are hooks triggered during a push (<emphasis>pre-receive</emphasis>,
+<emphasis>update</emphasis>, <emphasis>post-receive</emphasis>, <emphasis>post-update</emphasis>, <emphasis>push-to-checkout</emphasis>) which are always
+executed in $GIT_DIR.</simpara>
+<simpara>Environment variables, such as <emphasis>GIT_DIR</emphasis>, <emphasis>GIT_WORK_TREE</emphasis>, etc., are exported
+so that Git commands run by the hook can correctly locate the repository.  If
+your hook needs to invoke Git commands in a foreign repository or in a
+different working tree of the same repository, then it should clear these
+environment variables so they do not interfere with Git operations at the
+foreign location.  For example:</simpara>
+<screen>local_desc=$(git describe)
+foreign_desc=$(unset $(git rev-parse --local-env-vars); git -C ../foreign-repo describe)</screen>
+<simpara>Hooks can get their arguments via the environment, command-line
+arguments, and stdin. See the documentation for each hook below for
+details.</simpara>
+<simpara><emphasis>git init</emphasis> may copy hooks to the new repository, depending on its
+configuration. See the "TEMPLATE DIRECTORY" section in
+<xref linkend="git-init(1)" /> for details. When the rest of this document refers
+to "default hooks" it's talking about the default template shipped
+with Git.</simpara>
+<simpara>The currently supported hooks are described below.</simpara>
+</simplesect>
+<simplesect id="githooks(5)__hooks">
+<title>HOOKS</title>
+<section id="githooks(5)__applypatch_msg">
+<title>applypatch-msg</title>
+<simpara>This hook is invoked by <xref linkend="git-am(1)" />.  It takes a single
+parameter, the name of the file that holds the proposed commit
+log message.  Exiting with a non-zero status causes <emphasis>git am</emphasis> to abort
+before applying the patch.</simpara>
+<simpara>The hook is allowed to edit the message file in place, and can
+be used to normalize the message into some project standard
+format. It can also be used to refuse the commit after inspecting
+the message file.</simpara>
+<simpara>The default <emphasis>applypatch-msg</emphasis> hook, when enabled, runs the
+<emphasis>commit-msg</emphasis> hook, if the latter is enabled.</simpara>
+</section>
+<section id="githooks(5)__pre_applypatch">
+<title>pre-applypatch</title>
+<simpara>This hook is invoked by <xref linkend="git-am(1)" />.  It takes no parameter, and is
+invoked after the patch is applied, but before a commit is made.</simpara>
+<simpara>If it exits with non-zero status, then the working tree will not be
+committed after applying the patch.</simpara>
+<simpara>It can be used to inspect the current working tree and refuse to
+make a commit if it does not pass certain tests.</simpara>
+<simpara>The default <emphasis>pre-applypatch</emphasis> hook, when enabled, runs the
+<emphasis>pre-commit</emphasis> hook, if the latter is enabled.</simpara>
+</section>
+<section id="githooks(5)__post_applypatch">
+<title>post-applypatch</title>
+<simpara>This hook is invoked by <xref linkend="git-am(1)" />.  It takes no parameter,
+and is invoked after the patch is applied and a commit is made.</simpara>
+<simpara>This hook is meant primarily for notification, and cannot affect
+the outcome of <emphasis>git am</emphasis>.</simpara>
+</section>
+<section id="githooks(5)__pre_commit">
+<title>pre-commit</title>
+<simpara>This hook is invoked by <xref linkend="git-commit(1)" />, and can be bypassed
+with the <emphasis>--no-verify</emphasis> option.  It takes no parameters, and is
+invoked before obtaining the proposed commit log message and
+making a commit.  Exiting with a non-zero status from this script
+causes the <emphasis>git commit</emphasis> command to abort before creating a commit.</simpara>
+<simpara>All the <emphasis>git commit</emphasis> hooks are invoked with the environment
+variable <emphasis>GIT_EDITOR=:</emphasis> if the command will not bring up an editor
+to modify the commit message.</simpara>
+<simpara>The default <emphasis>pre-commit</emphasis> hook, when enabled, prevents the introduction
+of non-ASCII filenames and lines with trailing whitespace. The non-ASCII
+check can be turned off by setting the <emphasis>hooks.allownonascii</emphasis> config
+option to <emphasis>true</emphasis>.</simpara>
+</section>
+<section id="githooks(5)__pre_merge_commit">
+<title>pre-merge-commit</title>
+<simpara>This hook is invoked by <xref linkend="git-merge(1)" />, and can be bypassed
+with the <emphasis>--no-verify</emphasis> option.  It takes no parameters, and is
+invoked after the merge has been carried out successfully and before
+obtaining the proposed commit log message to
+make a commit.  Exiting with a non-zero status from this script
+causes the <emphasis>git merge</emphasis> command to abort before creating a commit.</simpara>
+<simpara>The default <emphasis>pre-merge-commit</emphasis> hook, when enabled, runs the
+<emphasis>pre-commit</emphasis> hook, if the latter is enabled.</simpara>
+<simpara>This hook is invoked with the environment variable
+<emphasis>GIT_EDITOR=:</emphasis> if the command will not bring up an editor
+to modify the commit message.</simpara>
+<simpara>If the merge cannot be carried out automatically, the conflicts
+need to be resolved and the result committed separately (see
+<xref linkend="git-merge(1)" />). At that point, this hook will not be executed,
+but the <emphasis>pre-commit</emphasis> hook will, if it is enabled.</simpara>
+</section>
+<section id="githooks(5)__prepare_commit_msg">
+<title>prepare-commit-msg</title>
+<simpara>This hook is invoked by <xref linkend="git-commit(1)" /> right after preparing the
+default log message, and before the editor is started.</simpara>
+<simpara>It takes one to three parameters.  The first is the name of the file
+that contains the commit log message.  The second is the source of the commit
+message, and can be: <emphasis>message</emphasis> (if a <emphasis>-m</emphasis> or <emphasis>-F</emphasis> option was
+given); <emphasis>template</emphasis> (if a <emphasis>-t</emphasis> option was given or the
+configuration option <emphasis>commit.template</emphasis> is set); <emphasis>merge</emphasis> (if the
+commit is a merge or a <emphasis>.git/MERGE_MSG</emphasis> file exists); <emphasis>squash</emphasis>
+(if a <emphasis>.git/SQUASH_MSG</emphasis> file exists); or <emphasis>commit</emphasis>, followed by
+a commit object name (if a <emphasis>-c</emphasis>, <emphasis>-C</emphasis> or <emphasis>--amend</emphasis> option was given).</simpara>
+<simpara>If the exit status is non-zero, <emphasis>git commit</emphasis> will abort.</simpara>
+<simpara>The purpose of the hook is to edit the message file in place, and
+it is not suppressed by the <emphasis>--no-verify</emphasis> option.  A non-zero exit
+means a failure of the hook and aborts the commit.  It should not
+be used as a replacement for the pre-commit hook.</simpara>
+<simpara>The sample <emphasis>prepare-commit-msg</emphasis> hook that comes with Git removes the
+help message found in the commented portion of the commit template.</simpara>
+</section>
+<section id="githooks(5)__commit_msg">
+<title>commit-msg</title>
+<simpara>This hook is invoked by <xref linkend="git-commit(1)" /> and <xref linkend="git-merge(1)" />, and can be
+bypassed with the <emphasis>--no-verify</emphasis> option.  It takes a single parameter,
+the name of the file that holds the proposed commit log message.
+Exiting with a non-zero status causes the command to abort.</simpara>
+<simpara>The hook is allowed to edit the message file in place, and can be used
+to normalize the message into some project standard format. It
+can also be used to refuse the commit after inspecting the message
+file.</simpara>
+<simpara>The default <emphasis>commit-msg</emphasis> hook, when enabled, detects duplicate
+<emphasis>Signed-off-by</emphasis> trailers, and aborts the commit if one is found.</simpara>
+</section>
+<section id="githooks(5)__post_commit">
+<title>post-commit</title>
+<simpara>This hook is invoked by <xref linkend="git-commit(1)" />. It takes no parameters, and is
+invoked after a commit is made.</simpara>
+<simpara>This hook is meant primarily for notification, and cannot affect
+the outcome of <emphasis>git commit</emphasis>.</simpara>
+</section>
+<section id="githooks(5)__pre_rebase">
+<title>pre-rebase</title>
+<simpara>This hook is called by <xref linkend="git-rebase(1)" /> and can be used to prevent a
+branch from getting rebased.  The hook may be called with one or
+two parameters.  The first parameter is the upstream from which
+the series was forked.  The second parameter is the branch being
+rebased, and is not set when rebasing the current branch.</simpara>
+</section>
+<section id="githooks(5)__post_checkout">
+<title>post-checkout</title>
+<simpara>This hook is invoked when a <xref linkend="git-checkout(1)" /> or
+<xref linkend="git-switch(1)" /> is run after having updated the
+worktree.  The hook is given three parameters: the ref of the previous HEAD,
+the ref of the new HEAD (which may or may not have changed), and a flag
+indicating whether the checkout was a branch checkout (changing branches,
+flag=1) or a file checkout (retrieving a file from the index, flag=0).
+This hook cannot affect the outcome of <emphasis>git switch</emphasis> or <emphasis>git checkout</emphasis>,
+other than that the hook's exit status becomes the exit status of
+these two commands.</simpara>
+<simpara>It is also run after <xref linkend="git-clone(1)" />, unless the <emphasis>--no-checkout</emphasis> (<emphasis>-n</emphasis>) option is
+used. The first parameter given to the hook is the null-ref, the second the
+ref of the new HEAD and the flag is always 1. Likewise for <emphasis>git worktree add</emphasis>
+unless <emphasis>--no-checkout</emphasis> is used.</simpara>
+<simpara>This hook can be used to perform repository validity checks, auto-display
+differences from the previous HEAD if different, or set working dir metadata
+properties.</simpara>
+</section>
+<section id="githooks(5)__post_merge">
+<title>post-merge</title>
+<simpara>This hook is invoked by <xref linkend="git-merge(1)" />, which happens when a <emphasis>git pull</emphasis>
+is done on a local repository.  The hook takes a single parameter, a status
+flag specifying whether or not the merge being done was a squash merge.
+This hook cannot affect the outcome of <emphasis>git merge</emphasis> and is not executed,
+if the merge failed due to conflicts.</simpara>
+<simpara>This hook can be used in conjunction with a corresponding pre-commit hook to
+save and restore any form of metadata associated with the working tree
+(e.g.: permissions/ownership, ACLS, etc).  See contrib/hooks/setgitperms.perl
+for an example of how to do this.</simpara>
+</section>
+<section id="githooks(5)__pre_push">
+<title>pre-push</title>
+<simpara>This hook is called by <xref linkend="git-push(1)" /> and can be used to prevent
+a push from taking place.  The hook is called with two parameters
+which provide the name and location of the destination remote, if a
+named remote is not being used both values will be the same.</simpara>
+<simpara>Information about what is to be pushed is provided on the hook's standard
+input with lines of the form:</simpara>
+<literallayout class="monospaced">&lt;local-ref&gt; SP &lt;local-object-name&gt; SP &lt;remote-ref&gt; SP &lt;remote-object-name&gt; LF</literallayout>
+<simpara>For instance, if the command <literal>git push origin master:foreign</literal> were run the
+hook would receive a line like the following:</simpara>
+<literallayout class="monospaced">refs/heads/master 67890 refs/heads/foreign 12345</literallayout>
+<simpara>although the full object name would be supplied.  If the foreign ref does not
+yet exist the <emphasis>&lt;remote-object-name&gt;</emphasis> will be the all-zeroes object name.  If a
+ref is to be deleted, the <emphasis>&lt;local-ref&gt;</emphasis> will be supplied as <emphasis>(delete)</emphasis> and the
+<emphasis>&lt;local-object-name&gt;</emphasis> will be the all-zeroes object name.  If the local commit
+was specified by something other than a name which could be expanded (such as
+<emphasis>HEAD~</emphasis>, or an object name) it will be supplied as it was originally given.</simpara>
+<simpara>If this hook exits with a non-zero status, <emphasis>git push</emphasis> will abort without
+pushing anything.  Information about why the push is rejected may be sent
+to the user by writing to standard error.</simpara>
+</section>
+<section id="githooks(5)_pre-receive">
+<title>pre-receive</title>
+<simpara>This hook is invoked by <xref linkend="git-receive-pack(1)" /> when it reacts to
+<emphasis>git push</emphasis> and updates reference(s) in its repository.
+Just before starting to update refs on the remote repository, the
+pre-receive hook is invoked.  Its exit status determines the success
+or failure of the update.</simpara>
+<simpara>This hook executes once for the receive operation. It takes no
+arguments, but for each ref to be updated it receives on standard
+input a line of the format:</simpara>
+<literallayout class="monospaced">&lt;old-oid&gt; SP &lt;new-oid&gt; SP &lt;ref-name&gt; LF</literallayout>
+<simpara>where <emphasis>&lt;old-oid&gt;</emphasis> is the old object name stored in the ref,
+<emphasis>&lt;new-oid&gt;</emphasis> is the new object name to be stored in the ref and
+<emphasis>&lt;ref-name&gt;</emphasis> is the full name of the ref.
+When creating a new ref, <emphasis>&lt;old-oid&gt;</emphasis> is the all-zeroes object name.</simpara>
+<simpara>If the hook exits with non-zero status, none of the refs will be
+updated. If the hook exits with zero, updating of individual refs can
+still be prevented by the <link linkend="githooks(5)_update"><emphasis>update</emphasis></link> hook.</simpara>
+<simpara>Both standard output and standard error output are forwarded to
+<emphasis>git send-pack</emphasis> on the other end, so you can simply <emphasis>echo</emphasis> messages
+for the user.</simpara>
+<simpara>The number of push options given on the command line of
+<emphasis>git push --push-option=...</emphasis> can be read from the environment
+variable <emphasis>GIT_PUSH_OPTION_COUNT</emphasis>, and the options themselves are
+found in <emphasis>GIT_PUSH_OPTION_0</emphasis>, <emphasis>GIT_PUSH_OPTION_1</emphasis>,&#8230;
+If it is negotiated to not use the push options phase, the
+environment variables will not be set. If the client selects
+to use push options, but doesn't transmit any, the count variable
+will be set to zero, <emphasis>GIT_PUSH_OPTION_COUNT=0</emphasis>.</simpara>
+<simpara>See the section on "Quarantine Environment" in
+<xref linkend="git-receive-pack(1)" /> for some caveats.</simpara>
+</section>
+<section id="githooks(5)_update">
+<title>update</title>
+<simpara>This hook is invoked by <xref linkend="git-receive-pack(1)" /> when it reacts to
+<emphasis>git push</emphasis> and updates reference(s) in its repository.
+Just before updating the ref on the remote repository, the update hook
+is invoked.  Its exit status determines the success or failure of
+the ref update.</simpara>
+<simpara>The hook executes once for each ref to be updated, and takes
+three parameters:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+the name of the ref being updated,
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the old object name stored in the ref,
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+and the new object name to be stored in the ref.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>A zero exit from the update hook allows the ref to be updated.
+Exiting with a non-zero status prevents <emphasis>git receive-pack</emphasis>
+from updating that ref.</simpara>
+<simpara>This hook can be used to prevent <emphasis>forced</emphasis> update on certain refs by
+making sure that the object name is a commit object that is a
+descendant of the commit object named by the old object name.
+That is, to enforce a "fast-forward only" policy.</simpara>
+<simpara>It could also be used to log the old..new status.  However, it
+does not know the entire set of branches, so it would end up
+firing one e-mail per ref when used naively, though.  The
+<link linkend="githooks(5)_post-receive"><emphasis>post-receive</emphasis></link> hook is more suited to that.</simpara>
+<simpara>In an environment that restricts the users' access only to git
+commands over the wire, this hook can be used to implement access
+control without relying on filesystem ownership and group
+membership. See <xref linkend="git-shell(1)" /> for how you might use the login
+shell to restrict the user's access to only git commands.</simpara>
+<simpara>Both standard output and standard error output are forwarded to
+<emphasis>git send-pack</emphasis> on the other end, so you can simply <emphasis>echo</emphasis> messages
+for the user.</simpara>
+<simpara>The default <emphasis>update</emphasis> hook, when enabled--and with
+<emphasis>hooks.allowunannotated</emphasis> config option unset or set to false--prevents
+unannotated tags from being pushed.</simpara>
+</section>
+<section id="githooks(5)_proc-receive">
+<title>proc-receive</title>
+<simpara>This hook is invoked by <xref linkend="git-receive-pack(1)" />.  If the server has
+set the multi-valued config variable <emphasis>receive.procReceiveRefs</emphasis>, and the
+commands sent to <emphasis>receive-pack</emphasis> have matching reference names, these
+commands will be executed by this hook, instead of by the internal
+<emphasis>execute_commands()</emphasis> function.  This hook is responsible for updating
+the relevant references and reporting the results back to <emphasis>receive-pack</emphasis>.</simpara>
+<simpara>This hook executes once for the receive operation.  It takes no
+arguments, but uses a pkt-line format protocol to communicate with
+<emphasis>receive-pack</emphasis> to read commands, push-options and send results.  In the
+following example for the protocol, the letter <emphasis>S</emphasis> stands for
+<emphasis>receive-pack</emphasis> and the letter <emphasis>H</emphasis> stands for this hook.</simpara>
+<literallayout class="monospaced"># Version and features negotiation.
+S: PKT-LINE(version=1\0push-options atomic...)
+S: flush-pkt
+H: PKT-LINE(version=1\0push-options...)
+H: flush-pkt</literallayout>
+<literallayout class="monospaced"># Send commands from server to the hook.
+S: PKT-LINE(&lt;old-oid&gt; &lt;new-oid&gt; &lt;ref&gt;)
+S: ... ...
+S: flush-pkt
+# Send push-options only if the 'push-options' feature is enabled.
+S: PKT-LINE(push-option)
+S: ... ...
+S: flush-pkt</literallayout>
+<literallayout class="monospaced"># Receive results from the hook.
+# OK, run this command successfully.
+H: PKT-LINE(ok &lt;ref&gt;)
+# NO, I reject it.
+H: PKT-LINE(ng &lt;ref&gt; &lt;reason&gt;)
+# Fall through, let 'receive-pack' execute it.
+H: PKT-LINE(ok &lt;ref&gt;)
+H: PKT-LINE(option fall-through)
+# OK, but has an alternate reference.  The alternate reference name
+# and other status can be given in option directives.
+H: PKT-LINE(ok &lt;ref&gt;)
+H: PKT-LINE(option refname &lt;refname&gt;)
+H: PKT-LINE(option old-oid &lt;old-oid&gt;)
+H: PKT-LINE(option new-oid &lt;new-oid&gt;)
+H: PKT-LINE(option forced-update)
+H: ... ...
+H: flush-pkt</literallayout>
+<simpara>Each command for the <emphasis>proc-receive</emphasis> hook may point to a pseudo-reference
+and always has a zero-old as its old-oid, while the <emphasis>proc-receive</emphasis> hook
+may update an alternate reference and the alternate reference may exist
+already with a non-zero old-oid.  For this case, this hook will use
+"option" directives to report extended attributes for the reference given
+by the leading "ok" directive.</simpara>
+<simpara>The report of the commands of this hook should have the same order as
+the input.  The exit status of the <emphasis>proc-receive</emphasis> hook only determines
+the success or failure of the group of commands sent to it, unless
+atomic push is in use.</simpara>
+</section>
+<section id="githooks(5)_post-receive">
+<title>post-receive</title>
+<simpara>This hook is invoked by <xref linkend="git-receive-pack(1)" /> when it reacts to
+<emphasis>git push</emphasis> and updates reference(s) in its repository.
+The hook executes on the remote repository once after all the proposed
+ref updates are processed and if at least one ref is updated as the
+result.</simpara>
+<simpara>The hook takes no arguments.  It receives one line on standard input for
+each ref that is successfully updated following the same format as the
+<link linkend="githooks(5)_pre-receive"><emphasis>pre-receive</emphasis></link> hook.</simpara>
+<simpara>This hook does not affect the outcome of <emphasis>git receive-pack</emphasis>, as it
+is called after the real work is done.</simpara>
+<simpara>This supersedes the <link linkend="githooks(5)_post-update"><emphasis>post-update</emphasis></link> hook in that it gets
+both old and new values of all the refs in addition to their
+names.</simpara>
+<simpara>Both standard output and standard error output are forwarded to
+<emphasis>git send-pack</emphasis> on the other end, so you can simply <emphasis>echo</emphasis> messages
+for the user.</simpara>
+<simpara>The default <emphasis>post-receive</emphasis> hook is empty, but there is
+a sample script <emphasis>post-receive-email</emphasis> provided in the <emphasis>contrib/hooks</emphasis>
+directory in Git distribution, which implements sending commit
+emails.</simpara>
+<simpara>The number of push options given on the command line of
+<emphasis>git push --push-option=...</emphasis> can be read from the environment
+variable <emphasis>GIT_PUSH_OPTION_COUNT</emphasis>, and the options themselves are
+found in <emphasis>GIT_PUSH_OPTION_0</emphasis>, <emphasis>GIT_PUSH_OPTION_1</emphasis>,&#8230;
+If it is negotiated to not use the push options phase, the
+environment variables will not be set. If the client selects
+to use push options, but doesn't transmit any, the count variable
+will be set to zero, <emphasis>GIT_PUSH_OPTION_COUNT=0</emphasis>.</simpara>
+<simpara>See the "post-receive" section in <xref linkend="git-receive-pack(1)" /> for
+additional details.</simpara>
+</section>
+<section id="githooks(5)_post-update">
+<title>post-update</title>
+<simpara>This hook is invoked by <xref linkend="git-receive-pack(1)" /> when it reacts to
+<emphasis>git push</emphasis> and updates reference(s) in its repository.
+It executes on the remote repository once after all the refs have
+been updated.</simpara>
+<simpara>It takes a variable number of parameters, each of which is the
+name of ref that was actually updated.</simpara>
+<simpara>This hook is meant primarily for notification, and cannot affect
+the outcome of <emphasis>git receive-pack</emphasis>.</simpara>
+<simpara>The <emphasis>post-update</emphasis> hook can tell what are the heads that were pushed,
+but it does not know what their original and updated values are,
+so it is a poor place to do log old..new. The
+<link linkend="githooks(5)_post-receive"><emphasis>post-receive</emphasis></link> hook does get both original and
+updated values of the refs. You might consider it instead if you need
+them.</simpara>
+<simpara>When enabled, the default <emphasis>post-update</emphasis> hook runs
+<emphasis>git update-server-info</emphasis> to keep the information used by dumb
+transports (e.g., HTTP) up to date.  If you are publishing
+a Git repository that is accessible via HTTP, you should
+probably enable this hook.</simpara>
+<simpara>Both standard output and standard error output are forwarded to
+<emphasis>git send-pack</emphasis> on the other end, so you can simply <emphasis>echo</emphasis> messages
+for the user.</simpara>
+</section>
+<section id="githooks(5)__reference_transaction">
+<title>reference-transaction</title>
+<simpara>This hook is invoked by any Git command that performs reference
+updates. It executes whenever a reference transaction is prepared,
+committed or aborted and may thus get called multiple times. The hook
+also supports symbolic reference updates.</simpara>
+<simpara>The hook takes exactly one argument, which is the current state the
+given reference transaction is in:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+"prepared": All reference updates have been queued to the
+      transaction and references were locked on disk.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+"committed": The reference transaction was committed and all
+      references now have their respective new value.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+"aborted": The reference transaction was aborted, no changes
+      were performed and the locks have been released.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>For each reference update that was added to the transaction, the hook
+receives on standard input a line of the format:</simpara>
+<literallayout class="monospaced">&lt;old-value&gt; SP &lt;new-value&gt; SP &lt;ref-name&gt; LF</literallayout>
+<simpara>where <emphasis>&lt;old-value&gt;</emphasis> is the old object name passed into the reference
+transaction, <emphasis>&lt;new-value&gt;</emphasis> is the new object name to be stored in the
+ref and <emphasis>&lt;ref-name&gt;</emphasis> is the full name of the ref. When force updating
+the reference regardless of its current value or when the reference is
+to be created anew, <emphasis>&lt;old-value&gt;</emphasis> is the all-zeroes object name. To
+distinguish these cases, you can inspect the current value of
+<emphasis>&lt;ref-name&gt;</emphasis> via <emphasis>git rev-parse</emphasis>.</simpara>
+<simpara>For symbolic reference updates the <emphasis>&lt;old_value&gt;</emphasis> and <emphasis>&lt;new-value&gt;</emphasis>
+fields could denote references instead of objects. A reference will be
+denoted with a <emphasis>ref:</emphasis> prefix, like <emphasis>ref:&lt;ref-target&gt;</emphasis>.</simpara>
+<simpara>The exit status of the hook is ignored for any state except for the
+"prepared" state. In the "prepared" state, a non-zero exit status will
+cause the transaction to be aborted. The hook will not be called with
+"aborted" state in that case.</simpara>
+</section>
+<section id="githooks(5)__push_to_checkout">
+<title>push-to-checkout</title>
+<simpara>This hook is invoked by <xref linkend="git-receive-pack(1)" /> when it reacts to
+<emphasis>git push</emphasis> and updates reference(s) in its repository, and when
+the push tries to update the branch that is currently checked out
+and the <emphasis>receive.denyCurrentBranch</emphasis> configuration variable is set to
+<emphasis>updateInstead</emphasis>.  Such a push by default is refused if the working
+tree and the index of the remote repository has any difference from
+the currently checked out commit; when both the working tree and the
+index match the current commit, they are updated to match the newly
+pushed tip of the branch.  This hook is to be used to override the
+default behaviour.</simpara>
+<simpara>The hook receives the commit with which the tip of the current
+branch is going to be updated.  It can exit with a non-zero status
+to refuse the push (when it does so, it must not modify the index or
+the working tree).  Or it can make any necessary changes to the
+working tree and to the index to bring them to the desired state
+when the tip of the current branch is updated to the new commit, and
+exit with a zero status.</simpara>
+<simpara>For example, the hook can simply run <emphasis>git read-tree -u -m HEAD "$1"</emphasis>
+in order to emulate <emphasis>git fetch</emphasis> that is run in the reverse direction
+with <emphasis>git push</emphasis>, as the two-tree form of <emphasis>git read-tree -u -m</emphasis> is
+essentially the same as <emphasis>git switch</emphasis> or <emphasis>git checkout</emphasis>
+that switches branches while
+keeping the local changes in the working tree that do not interfere
+with the difference between the branches.</simpara>
+</section>
+<section id="githooks(5)__pre_auto_gc">
+<title>pre-auto-gc</title>
+<simpara>This hook is invoked by <emphasis>git gc --auto</emphasis> (see <xref linkend="git-gc(1)" />). It
+takes no parameter, and exiting with non-zero status from this script
+causes the <emphasis>git gc --auto</emphasis> to abort.</simpara>
+</section>
+<section id="githooks(5)__post_rewrite">
+<title>post-rewrite</title>
+<simpara>This hook is invoked by commands that rewrite commits
+(<xref linkend="git-commit(1)" /> when called with <emphasis>--amend</emphasis> and
+<xref linkend="git-rebase(1)" />; however, full-history (re)writing tools like
+<xref linkend="git-fast-import(1)" /> or
+<ulink url="https://github.com/newren/git-filter-repo">git-filter-repo</ulink> typically
+do not call it!).  Its first argument denotes the command it was
+invoked by: currently one of <emphasis>amend</emphasis> or <emphasis>rebase</emphasis>.  Further
+command-dependent arguments may be passed in the future.</simpara>
+<simpara>The hook receives a list of the rewritten commits on stdin, in the
+format</simpara>
+<literallayout class="monospaced">&lt;old-object-name&gt; SP &lt;new-object-name&gt; [ SP &lt;extra-info&gt; ] LF</literallayout>
+<simpara>The <emphasis>extra-info</emphasis> is again command-dependent.  If it is empty, the
+preceding SP is also omitted.  Currently, no commands pass any
+<emphasis>extra-info</emphasis>.</simpara>
+<simpara>The hook always runs after the automatic note copying (see
+"notes.rewrite.&lt;command&gt;" in <xref linkend="git-config(1)" />) has happened, and
+thus has access to these notes.</simpara>
+<simpara>The following command-specific comments apply:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+rebase
+</term>
+<listitem>
+<simpara>
+        For the <emphasis>squash</emphasis> and <emphasis>fixup</emphasis> operation, all commits that were
+        squashed are listed as being rewritten to the squashed commit.
+        This means that there will be several lines sharing the same
+        <emphasis>new-object-name</emphasis>.
+</simpara>
+<simpara>The commits are guaranteed to be listed in the order that they were
+processed by rebase.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+<section id="githooks(5)__sendemail_validate">
+<title>sendemail-validate</title>
+<simpara>This hook is invoked by <xref linkend="git-send-email(1)" />.</simpara>
+<simpara>It takes these command line arguments. They are,
+1. the name of the file which holds the contents of the email to be sent.
+2. The name of the file which holds the SMTP headers of the email.</simpara>
+<simpara>The SMTP headers are passed in the exact same way as they are passed to the
+user's Mail Transport Agent (MTA). In effect, the email given to the user's
+MTA, is the contents of $2 followed by the contents of $1.</simpara>
+<simpara>An example of a few common headers is shown below. Take notice of the
+capitalization and multi-line tab structure.</simpara>
+<literallayout class="monospaced">From: Example &lt;from@example.com&gt;
+To: to@example.com
+Cc: cc@example.com,
+        A &lt;author@example.com&gt;,
+        One &lt;one@example.com&gt;,
+        two@example.com
+Subject: PATCH-STRING</literallayout>
+<simpara>Exiting with a non-zero status causes <emphasis>git send-email</emphasis> to abort
+before sending any e-mails.</simpara>
+<simpara>The following environment variables are set when executing the hook.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>GIT_SENDEMAIL_FILE_COUNTER</emphasis>
+</term>
+<listitem>
+<simpara>
+        A 1-based counter incremented by one for every file holding an e-mail
+        to be sent (excluding any FIFOs). This counter does not follow the
+        patch series counter scheme. It will always start at 1 and will end at
+        GIT_SENDEMAIL_FILE_TOTAL.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_SENDEMAIL_FILE_TOTAL</emphasis>
+</term>
+<listitem>
+<simpara>
+        The total number of files that will be sent (excluding any FIFOs). This
+        counter does not follow the patch series counter scheme. It will always
+        be equal to the number of files being sent, whether there is a cover
+        letter or not.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>These variables may for instance be used to validate patch series.</simpara>
+<simpara>The sample <emphasis>sendemail-validate</emphasis> hook that comes with Git checks that all sent
+patches (excluding the cover letter) can be applied on top of the upstream
+repository default branch without conflicts. Some placeholders are left for
+additional validation steps to be performed after all patches of a given series
+have been applied.</simpara>
+</section>
+<section id="githooks(5)__fsmonitor_watchman">
+<title>fsmonitor-watchman</title>
+<simpara>This hook is invoked when the configuration option <emphasis>core.fsmonitor</emphasis> is
+set to <emphasis>.git/hooks/fsmonitor-watchman</emphasis> or <emphasis>.git/hooks/fsmonitor-watchmanv2</emphasis>
+depending on the version of the hook to use.</simpara>
+<simpara>Version 1 takes two arguments, a version (1) and the time in elapsed
+nanoseconds since midnight, January 1, 1970.</simpara>
+<simpara>Version 2 takes two arguments, a version (2) and a token that is used
+for identifying changes since the token. For watchman this would be
+a clock id. This version must output to stdout the new token followed
+by a NUL before the list of files.</simpara>
+<simpara>The hook should output to stdout the list of all files in the working
+directory that may have changed since the requested time.  The logic
+should be inclusive so that it does not miss any potential changes.
+The paths should be relative to the root of the working directory
+and be separated by a single NUL.</simpara>
+<simpara>It is OK to include files which have not actually changed.  All changes
+including newly-created and deleted files should be included. When
+files are renamed, both the old and the new name should be included.</simpara>
+<simpara>Git will limit what files it checks for changes as well as which
+directories are checked for untracked files based on the path names
+given.</simpara>
+<simpara>An optimized way to tell git "all files have changed" is to return
+the filename <emphasis>/</emphasis>.</simpara>
+<simpara>The exit status determines whether git will use the data from the
+hook to limit its search.  On error, it will fall back to verifying
+all files and folders.</simpara>
+</section>
+<section id="githooks(5)__p4_changelist">
+<title>p4-changelist</title>
+<simpara>This hook is invoked by <emphasis>git-p4 submit</emphasis>.</simpara>
+<simpara>The <emphasis>p4-changelist</emphasis> hook is executed after the changelist
+message has been edited by the user. It can be bypassed with the
+<emphasis>--no-verify</emphasis> option. It takes a single parameter, the name
+of the file that holds the proposed changelist text. Exiting
+with a non-zero status causes the command to abort.</simpara>
+<simpara>The hook is allowed to edit the changelist file and can be used
+to normalize the text into some project standard format. It can
+also be used to refuse the Submit after inspect the message file.</simpara>
+<simpara>Run <emphasis>git-p4 submit --help</emphasis> for details.</simpara>
+</section>
+<section id="githooks(5)__p4_prepare_changelist">
+<title>p4-prepare-changelist</title>
+<simpara>This hook is invoked by <emphasis>git-p4 submit</emphasis>.</simpara>
+<simpara>The <emphasis>p4-prepare-changelist</emphasis> hook is executed right after preparing
+the default changelist message and before the editor is started.
+It takes one parameter, the name of the file that contains the
+changelist text. Exiting with a non-zero status from the script
+will abort the process.</simpara>
+<simpara>The purpose of the hook is to edit the message file in place,
+and it is not suppressed by the <emphasis>--no-verify</emphasis> option. This hook
+is called even if <emphasis>--prepare-p4-only</emphasis> is set.</simpara>
+<simpara>Run <emphasis>git-p4 submit --help</emphasis> for details.</simpara>
+</section>
+<section id="githooks(5)__p4_post_changelist">
+<title>p4-post-changelist</title>
+<simpara>This hook is invoked by <emphasis>git-p4 submit</emphasis>.</simpara>
+<simpara>The <emphasis>p4-post-changelist</emphasis> hook is invoked after the submit has
+successfully occurred in P4. It takes no parameters and is meant
+primarily for notification and cannot affect the outcome of the
+git p4 submit action.</simpara>
+<simpara>Run <emphasis>git-p4 submit --help</emphasis> for details.</simpara>
+</section>
+<section id="githooks(5)__p4_pre_submit">
+<title>p4-pre-submit</title>
+<simpara>This hook is invoked by <emphasis>git-p4 submit</emphasis>. It takes no parameters and nothing
+from standard input. Exiting with non-zero status from this script prevent
+<emphasis>git-p4 submit</emphasis> from launching. It can be bypassed with the <emphasis>--no-verify</emphasis>
+command line option. Run <emphasis>git-p4 submit --help</emphasis> for details.</simpara>
+</section>
+<section id="githooks(5)__post_index_change">
+<title>post-index-change</title>
+<simpara>This hook is invoked when the index is written in read-cache.c
+do_write_locked_index.</simpara>
+<simpara>The first parameter passed to the hook is the indicator for the
+working directory being updated.  "1" meaning working directory
+was updated or "0" when the working directory was not updated.</simpara>
+<simpara>The second parameter passed to the hook is the indicator for whether
+or not the index was updated and the skip-worktree bit could have
+changed.  "1" meaning skip-worktree bits could have been updated
+and "0" meaning they were not.</simpara>
+<simpara>Only one parameter should be set to "1" when the hook runs.  The hook
+running passing "1", "1" should not be possible.</simpara>
+</section>
+</simplesect>
+<simplesect id="githooks(5)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="git-hook(1)" /></simpara>
+</simplesect>
+<simplesect id="githooks(5)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

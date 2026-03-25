@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-tag(1)">
+    <title>git-tag(1)</title>
+<indexterm>
+<primary>git-tag(1)</primary>
+</indexterm>
+<simplesect id="git-tag(1)__name">
+<title>NAME</title>
+<simpara>git-tag - Create, list, delete or verify tags</simpara>
+</simplesect>
+<simplesect id="git-tag(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><code>git</code> <code>tag</code> [<code>-a</code> | <code>-s</code> | <code>-u</code> <emphasis>&lt;key-id&gt;</emphasis>] [<code>-f</code>] [<code>-m</code> <emphasis>&lt;msg&gt;</emphasis> | <code>-F</code> <emphasis>&lt;file&gt;</emphasis>] [<code>-e</code>]
+        [(<code>--trailer</code> <emphasis>&lt;token&gt;</emphasis>[(<code>=</code>|<code>:</code>)<emphasis>&lt;value&gt;</emphasis>])<code>&#8230;</code>]
+        <emphasis>&lt;tagname&gt;</emphasis> [<emphasis>&lt;commit&gt;</emphasis> | <emphasis>&lt;object&gt;</emphasis>]
+<code>git</code> <code>tag</code> <code>-d</code> <emphasis>&lt;tagname&gt;</emphasis><code>&#8230;</code>
+<code>git</code> <code>tag</code> [<code>-n</code>[<emphasis>&lt;num&gt;</emphasis>]] <code>-l</code> [<code>--contains</code> <emphasis>&lt;commit&gt;</emphasis>] [<code>--no-contains</code> <emphasis>&lt;commit&gt;</emphasis>]
+        [<code>--points-at</code> <emphasis>&lt;object&gt;</emphasis>] [<code>--column</code>[<code>=</code><emphasis>&lt;options&gt;</emphasis>] | <code>--no-column</code>]
+        [<code>--create-reflog</code>] [<code>--sort=</code><emphasis>&lt;key&gt;</emphasis>] [<code>--format=</code><emphasis>&lt;format&gt;</emphasis>]
+        [<code>--merged</code> <emphasis>&lt;commit&gt;</emphasis>] [<code>--no-merged</code> <emphasis>&lt;commit&gt;</emphasis>] [<emphasis>&lt;pattern&gt;</emphasis><code>&#8230;</code>]
+<code>git</code> <code>tag</code> <code>-v</code> [<code>--format=</code><emphasis>&lt;format&gt;</emphasis>] <emphasis>&lt;tagname&gt;</emphasis><code>&#8230;</code></literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-tag(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Add a tag reference in <emphasis>refs/tags/</emphasis>, unless <emphasis>-d</emphasis>/<emphasis>-l</emphasis>/<emphasis>-v</emphasis> is given
+to delete, list or verify tags.</simpara>
+<simpara>Unless <emphasis>-f</emphasis> is given, the named tag must not yet exist.</simpara>
+<simpara>If one of <emphasis>-a</emphasis>, <emphasis>-s</emphasis>, or <emphasis>-u &lt;key-id&gt;</emphasis> is passed, the command
+creates a <emphasis>tag</emphasis> object, and requires a tag message.  Unless
+<emphasis>-m &lt;msg&gt;</emphasis> or <emphasis>-F &lt;file&gt;</emphasis> is given, an editor is started for the user to type
+in the tag message.</simpara>
+<simpara>If <emphasis>-m &lt;msg&gt;</emphasis> or <emphasis>-F &lt;file&gt;</emphasis> or <emphasis>--trailer &lt;token&gt;[=&lt;value&gt;]</emphasis> is given
+and <emphasis>-a</emphasis>, <emphasis>-s</emphasis>, and <emphasis>-u &lt;key-id&gt;</emphasis> are absent, <emphasis>-a</emphasis> is implied.</simpara>
+<simpara>Otherwise, a tag reference that points directly at the given object
+(i.e., a lightweight tag) is created.</simpara>
+<simpara>A cryptographically signed tag object will be created when <emphasis>-s</emphasis> or
+<emphasis>-u &lt;key-id&gt;</emphasis> is used. The signing backend (GPG, X.509, SSH, etc.) is
+controlled by the <emphasis>gpg.format</emphasis> configuration variable, defaulting to
+OpenPGP. When <emphasis>-u &lt;key-id&gt;</emphasis> is not used, the committer identity for
+the current user is used to find the key for signing. The
+configuration variable <emphasis>gpg.program</emphasis> is used to specify a custom
+signing binary.</simpara>
+<simpara>Tag objects (created with <emphasis>-a</emphasis>, <emphasis>-s</emphasis>, or <emphasis>-u</emphasis>) are called "annotated"
+tags; they contain a creation date, the tagger name and e-mail, a
+tagging message, and an optional cryptographic signature. Whereas a
+"lightweight" tag is simply a name for an object (usually a commit
+object).</simpara>
+<simpara>Annotated tags are meant for release while lightweight tags are meant
+for private or temporary object labels. For this reason, some git
+commands for naming objects (like <emphasis>git describe</emphasis>) will ignore
+lightweight tags by default.</simpara>
+</simplesect>
+<simplesect id="git-tag(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>-a</emphasis>
+</term>
+<term>
+<emphasis>--annotate</emphasis>
+</term>
+<listitem>
+<simpara>
+        Make an unsigned, annotated tag object
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-s</emphasis>
+</term>
+<term>
+<emphasis>--sign</emphasis>
+</term>
+<listitem>
+<simpara>
+        Make a cryptographically signed tag, using the default signing
+        key. The signing backend used depends on the <emphasis>gpg.format</emphasis>
+        configuration variable. The default key is determined by the
+        backend. For GPG, it's based on the committer's email address,
+        while for SSH it may be a specific key file or agent
+        identity. See <xref linkend="git-config(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--no-sign</emphasis>
+</term>
+<listitem>
+<simpara>
+        Override <emphasis>tag.gpgSign</emphasis> configuration variable that is
+        set to force each and every tag to be signed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-u &lt;key-id&gt;</emphasis>
+</term>
+<term>
+<emphasis>--local-user=&lt;key-id&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Make a cryptographically signed tag using the given key. The
+        format of the &lt;key-id&gt; and the backend used depend on the
+        <emphasis>gpg.format</emphasis> configuration variable. See
+        <xref linkend="git-config(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-f</emphasis>
+</term>
+<term>
+<emphasis>--force</emphasis>
+</term>
+<listitem>
+<simpara>
+        Replace an existing tag with the given name (instead of failing)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-d</emphasis>
+</term>
+<term>
+<emphasis>--delete</emphasis>
+</term>
+<listitem>
+<simpara>
+        Delete existing tags with the given names.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-v</emphasis>
+</term>
+<term>
+<emphasis>--verify</emphasis>
+</term>
+<listitem>
+<simpara>
+        Verify the cryptographic signature of the given tags.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-n&lt;num&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        <emphasis>&lt;num&gt;</emphasis> specifies how many lines from the annotation, if any,
+        are printed when using <emphasis>-l</emphasis>. Implies <emphasis>--list</emphasis>.
+</simpara>
+<simpara>The default is not to print any annotation lines.
+If no number is given to <emphasis>-n</emphasis>, only the first line is printed.
+If the tag is not annotated, the commit message is displayed instead.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-l</emphasis>
+</term>
+<term>
+<emphasis>--list</emphasis>
+</term>
+<listitem>
+<simpara>
+        List tags. With optional <emphasis>&lt;pattern&gt;...</emphasis>, e.g. <emphasis>git tag --list
+        'v-*'</emphasis>, list only the tags that match the pattern(s).
+</simpara>
+<simpara>Running <emphasis>git tag</emphasis> without arguments also lists all tags. The pattern
+is a shell wildcard (i.e., matched using <emphasis>fnmatch</emphasis>(3)). Multiple
+patterns may be given; if any of them matches, the tag is shown.</simpara>
+<simpara>This option is implicitly supplied if any other list-like option such
+as <emphasis>--contains</emphasis> is provided. See the documentation for each of those
+options for details.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--sort=&lt;key&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Sort based on the key given.  Prefix <emphasis>-</emphasis> to sort in
+        descending order of the value. You may use the <emphasis>--sort=&lt;key&gt;</emphasis> option
+        multiple times, in which case the last <emphasis>&lt;key&gt;</emphasis> becomes the primary
+        key. Also supports "<emphasis>version:refname</emphasis>" or "<emphasis>v:refname</emphasis>" (tag
+        names are treated as versions). The "<emphasis>version:refname</emphasis>" sort
+        order can also be affected by the "<emphasis>versionsort.suffix</emphasis>"
+        configuration variable.
+        The keys supported are the same as those in <emphasis>git for-each-ref</emphasis>.
+        Sort order defaults to the value configured for the <emphasis>tag.sort</emphasis>
+        variable if it exists, or lexicographic order otherwise. See
+        <xref linkend="git-config(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--color[=&lt;when&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Respect any colors specified in the <emphasis>--format</emphasis> option. The
+        <emphasis>&lt;when&gt;</emphasis> field must be one of <emphasis>always</emphasis>, <emphasis>never</emphasis>, or <emphasis>auto</emphasis> (if
+        <emphasis>&lt;when&gt;</emphasis> is absent, behave as if <emphasis>always</emphasis> was given).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-i</emphasis>
+</term>
+<term>
+<emphasis>--ignore-case</emphasis>
+</term>
+<listitem>
+<simpara>
+        Sorting and filtering tags are case insensitive.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--omit-empty</emphasis>
+</term>
+<listitem>
+<simpara>
+        Do not print a newline after formatted refs where the format expands
+        to the empty string.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--column[=&lt;options&gt;]</emphasis>
+</term>
+<term>
+<emphasis>--no-column</emphasis>
+</term>
+<listitem>
+<simpara>
+        Display tag listing in columns. See configuration variable
+        <emphasis>column.tag</emphasis> for option syntax. <emphasis>--column</emphasis> and <emphasis>--no-column</emphasis>
+        without options are equivalent to <emphasis>always</emphasis> and <emphasis>never</emphasis> respectively.
+</simpara>
+<simpara>This option is only applicable when listing tags without annotation lines.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--contains [&lt;commit&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list tags which contain <emphasis>&lt;commit&gt;</emphasis> (<emphasis>HEAD</emphasis> if not
+        specified). Implies <emphasis>--list</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--no-contains [&lt;commit&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list tags which don't contain <emphasis>&lt;commit&gt;</emphasis> (<emphasis>HEAD</emphasis> if
+        not specified). Implies <emphasis>--list</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--merged [&lt;commit&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list tags whose commits are reachable from
+        <emphasis>&lt;commit&gt;</emphasis> (<emphasis>HEAD</emphasis> if not specified).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--no-merged [&lt;commit&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list tags whose commits are not reachable from
+        <emphasis>&lt;commit&gt;</emphasis> (<emphasis>HEAD</emphasis> if not specified).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--points-at [&lt;object&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Only list tags of <emphasis>&lt;object&gt;</emphasis> (<emphasis>HEAD</emphasis> if not
+        specified). Implies <emphasis>--list</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-m &lt;msg&gt;</emphasis>
+</term>
+<term>
+<emphasis>--message=&lt;msg&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Use <emphasis>&lt;msg&gt;</emphasis> (instead of prompting).
+        If multiple <emphasis>-m</emphasis> options are given, their values are
+        concatenated as separate paragraphs.
+        Implies <emphasis>-a</emphasis> if none of <emphasis>-a</emphasis>, <emphasis>-s</emphasis>, or <emphasis>-u &lt;key-id&gt;</emphasis>
+        is given.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-F &lt;file&gt;</emphasis>
+</term>
+<term>
+<emphasis>--file=&lt;file&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Take the tag message from <emphasis>&lt;file&gt;</emphasis>.  Use <emphasis>-</emphasis> to
+        read the message from the standard input.
+        Implies <emphasis>-a</emphasis> if none of <emphasis>-a</emphasis>, <emphasis>-s</emphasis>, or <emphasis>-u &lt;key-id&gt;</emphasis>
+        is given.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--trailer &lt;token&gt;[(=|:)&lt;value&gt;]</emphasis>
+</term>
+<listitem>
+<simpara>
+        Specify a (<emphasis>&lt;token&gt;</emphasis>, <emphasis>&lt;value&gt;</emphasis>) pair that should be applied as a
+        trailer. (e.g. <emphasis>git tag --trailer "Custom-Key: value"</emphasis>
+        will add a "Custom-Key" trailer to the tag message.)
+        The <emphasis>trailer.*</emphasis> configuration variables
+        (<xref linkend="git-interpret-trailers(1)" />) can be used to define if
+        a duplicated trailer is omitted, where in the run of trailers
+        each trailer would appear, and other details.
+        The trailers can be extracted in <emphasis>git tag --list</emphasis>, using
+        <emphasis>--format="%(trailers)"</emphasis> placeholder.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-e</emphasis>
+</term>
+<term>
+<emphasis>--edit</emphasis>
+</term>
+<listitem>
+<simpara>
+        Let further edit the message taken from file with <emphasis>-F</emphasis> and command line with
+        <emphasis>-m</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--cleanup=&lt;mode&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Set how the tag message is cleaned up.
+        The  <emphasis>&lt;mode&gt;</emphasis> can be one of <emphasis>verbatim</emphasis>, <emphasis>whitespace</emphasis> and <emphasis>strip</emphasis>.  The
+        <emphasis>strip</emphasis> mode is default. The <emphasis>verbatim</emphasis> mode does not change message at
+        all, <emphasis>whitespace</emphasis> removes just leading/trailing whitespace lines and
+        <emphasis>strip</emphasis> removes both whitespace and commentary.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--create-reflog</emphasis>
+</term>
+<listitem>
+<simpara>
+        Create a reflog for the tag. To globally enable reflogs for tags, see
+        <emphasis>core.logAllRefUpdates</emphasis> in <xref linkend="git-config(1)" />.
+        The negated form <emphasis>--no-create-reflog</emphasis> only overrides an earlier
+        <emphasis>--create-reflog</emphasis>, but currently does not negate the setting of
+        <emphasis>core.logAllRefUpdates</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--format=&lt;format&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        A string that interpolates <emphasis>%(fieldname)</emphasis> from a tag ref being shown
+        and the object it points at.  The format is the same as
+        that of <xref linkend="git-for-each-ref(1)" />.  When unspecified,
+        defaults to <emphasis>%(refname:strip=2)</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>&lt;tagname&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        The name of the tag to create, delete, or describe.
+        The new tag name must pass all checks defined by
+        <xref linkend="git-check-ref-format(1)" />.  Some of these checks
+        may restrict the characters allowed in a tag name.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>&lt;commit&gt;</emphasis>
+</term>
+<term>
+<emphasis>&lt;object&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        The object that the new tag will refer to, usually a commit.
+        Defaults to <emphasis>HEAD</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-tag(1)__configuration">
+<title>CONFIGURATION</title>
+<simpara>By default, <emphasis>git tag</emphasis> in sign-with-default mode (<emphasis>-s</emphasis>) will use your
+committer identity (of the form <emphasis>Your Name &lt;your@email.address&gt;</emphasis>) to
+find a key.  If you want to use a different default key, you can specify
+it in the repository configuration as follows:</simpara>
+<screen>[user]
+    signingKey = &lt;key-id&gt;</screen>
+<simpara>The signing backend can be chosen via the <emphasis>gpg.format</emphasis> configuration
+variable, which defaults to <emphasis>openpgp</emphasis>. See <xref linkend="git-config(1)" />
+for a list of other supported formats.</simpara>
+<simpara>The path to the program used for each signing backend can be specified
+with the <emphasis>gpg.&lt;format&gt;.program</emphasis> configuration variable. For the
+<emphasis>openpgp</emphasis> backend, <emphasis>gpg.program</emphasis> can be used as a synonym for
+<emphasis>gpg.openpgp.program</emphasis>. See <xref linkend="git-config(1)" /> for details.</simpara>
+<simpara><emphasis>pager.tag</emphasis> is only respected when listing tags, i.e., when <emphasis>-l</emphasis> is
+used or implied. The default is to use a pager.</simpara>
+<simpara>See <xref linkend="git-config(1)" /> for more details and other configuration
+variables.</simpara>
+</simplesect>
+<simplesect id="git-tag(1)__discussion">
+<title>DISCUSSION</title>
+<section id="git-tag(1)__on_re_tagging">
+<title>On Re-tagging</title>
+<simpara>What should you do when you tag a wrong commit and you would
+want to re-tag?</simpara>
+<simpara>If you never pushed anything out, just re-tag it. Use <emphasis>-f</emphasis> to
+replace the old one. And you're done.</simpara>
+<simpara>But if you have pushed things out (or others could just read
+your repository directly), then others will have already seen
+the old tag. In that case you can do one of two things:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+The sane thing.
+  Just admit you screwed up, and use a different name. Others have
+  already seen one tag-name, and if you keep the same name, you
+  may be in the situation that two people both have "version X",
+  but they actually have <emphasis>different</emphasis> "X"'s.  So just call it "X.1"
+  and be done with it.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+The insane thing.
+  You really want to call the new version "X" too, <emphasis>even though</emphasis>
+  others have already seen the old one. So just use <emphasis>git tag -f</emphasis>
+  again, as if you hadn't already published the old one.
+</simpara>
+</listitem>
+</orderedlist>
+<simpara>However, Git does <emphasis role="strong">not</emphasis> (and it should not) change tags behind
+users back. So if somebody already got the old tag, doing a
+<emphasis>git pull</emphasis> on your tree shouldn't just make them overwrite the old
+one.</simpara>
+<simpara>If somebody got a release tag from you, you cannot just change
+the tag for them by updating your own one. This is a big
+security issue, in that people MUST be able to trust their
+tag-names.  If you really want to do the insane thing, you need
+to just fess up to it, and tell people that you messed up. You
+can do that by making a very public announcement saying:</simpara>
+<screen>Ok, I messed up, and I pushed out an earlier version tagged as X. I
+then fixed something, and retagged the *fixed* tree as X again.
+
+If you got the wrong tag, and want the new one, please delete
+the old one and fetch the new one by doing:
+
+        git tag -d X
+        git fetch origin tag X
+
+to get my updated tag.
+
+You can test which tag you have by doing
+
+        git rev-parse X
+
+which should return 0123456789abcdef.. if you have the new version.
+
+Sorry for the inconvenience.</screen>
+<simpara>Does this seem a bit complicated?  It <emphasis role="strong">should</emphasis> be. There is no
+way that it would be correct to just "fix" it automatically.
+People need to know that their tags might have been changed.</simpara>
+</section>
+<section id="git-tag(1)__on_automatic_following">
+<title>On Automatic following</title>
+<simpara>If you are following somebody else's tree, you are most likely
+using remote-tracking branches (eg. <emphasis>refs/remotes/origin/master</emphasis>).
+You usually want the tags from the other end.</simpara>
+<simpara>On the other hand, if you are fetching because you would want a
+one-shot merge from somebody else, you typically do not want to
+get tags from there.  This happens more often for people near
+the toplevel but not limited to them.  Mere mortals when pulling
+from each other do not necessarily want to automatically get
+private anchor point tags from the other person.</simpara>
+<simpara>Often, "please pull" messages on the mailing list just provide
+two pieces of information: a repo URL and a branch name; this
+is designed to be easily cut&amp;pasted at the end of a <emphasis>git fetch</emphasis>
+command line:</simpara>
+<screen>Linus, please pull from
+
+        git://git..../proj.git master
+
+to get the following updates...</screen>
+<simpara>becomes:</simpara>
+<screen>$ git pull git://git..../proj.git master</screen>
+<simpara>In such a case, you do not want to automatically follow the other
+person's tags.</simpara>
+<simpara>One important aspect of Git is its distributed nature, which
+largely means there is no inherent "upstream" or
+"downstream" in the system.  On the face of it, the above
+example might seem to indicate that the tag namespace is owned
+by the upper echelon of people and that tags only flow downwards, but
+that is not the case.  It only shows that the usage pattern
+determines who are interested in whose tags.</simpara>
+<simpara>A one-shot pull is a sign that a commit history is now crossing
+the boundary between one circle of people (e.g. "people who are
+primarily interested in the networking part of the kernel") who may
+have their own set of tags (e.g. "this is the third release
+candidate from the networking group to be proposed for general
+consumption with 2.6.21 release") to another circle of people
+(e.g. "people who integrate various subsystem improvements").
+The latter are usually not interested in the detailed tags used
+internally in the former group (that is what "internal" means).
+That is why it is desirable not to follow tags automatically in
+this case.</simpara>
+<simpara>It may well be that among networking people, they may want to
+exchange the tags internal to their group, but in that workflow
+they are most likely tracking each other's progress by
+having remote-tracking branches.  Again, the heuristic to automatically
+follow such tags is a good thing.</simpara>
+</section>
+<section id="git-tag(1)__on_backdating_tags">
+<title>On Backdating Tags</title>
+<simpara>If you have imported some changes from another VCS and would like
+to add tags for major releases of your work, it is useful to be able
+to specify the date to embed inside of the tag object; such data in
+the tag object affects, for example, the ordering of tags in the
+gitweb interface.</simpara>
+<simpara>To set the date used in future tag objects, set the environment
+variable GIT_COMMITTER_DATE (see the later discussion of possible
+values; the most common form is "YYYY-MM-DD HH:MM").</simpara>
+<simpara>For example:</simpara>
+<screen>$ GIT_COMMITTER_DATE="2006-10-02 10:31" git tag -s v1.0.1</screen>
+</section>
+</simplesect>
+<simplesect id="git-tag(1)__date_formats">
+<title>DATE FORMATS</title>
+<simpara>The <emphasis>GIT_AUTHOR_DATE</emphasis> and <emphasis>GIT_COMMITTER_DATE</emphasis> environment variables
+support the following date formats:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+Git internal format
+</term>
+<listitem>
+<simpara>
+        It is <emphasis>&lt;unix-timestamp&gt; &lt;time-zone-offset&gt;</emphasis>, where
+        <emphasis>&lt;unix-timestamp&gt;</emphasis> is the number of seconds since the UNIX epoch.
+        <emphasis>&lt;time-zone-offset&gt;</emphasis> is a positive or negative offset from UTC.
+        For example CET (which is 1 hour ahead of UTC) is <emphasis>+0100</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+RFC 2822
+</term>
+<listitem>
+<simpara>
+        The standard date format as described by RFC 2822, for example
+        <emphasis>Thu, 07 Apr 2005 22:13:13 +0200</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+ISO 8601
+</term>
+<listitem>
+<simpara>
+        Time and date specified by the ISO 8601 standard, for example
+        <emphasis>2005-04-07T22:13:13</emphasis>. The parser accepts a space instead of the
+        <emphasis>T</emphasis> character as well. Fractional parts of a second will be ignored,
+        for example <emphasis>2005-04-07T22:13:13.019</emphasis> will be treated as
+        <emphasis>2005-04-07T22:13:13</emphasis>.
+</simpara>
+<note><simpara>In addition, the date part is accepted in the following formats:
+<emphasis>YYYY.MM.DD</emphasis>, <emphasis>MM/DD/YYYY</emphasis> and <emphasis>DD.MM.YYYY</emphasis>.</simpara></note>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-tag(1)__files">
+<title>FILES</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>$GIT_DIR/TAG_EDITMSG</emphasis>
+</term>
+<listitem>
+<simpara>
+        This file contains the message of an in-progress annotated
+        tag. If <emphasis>git tag</emphasis> exits due to an error before creating an
+        annotated tag then the tag message that has been provided by the
+        user in an editor session will be available in this file, but
+        may be overwritten by the next invocation of <emphasis>git tag</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-tag(1)__configuration_2">
+<title>CONFIGURATION</title>
+<simpara>Everything below this line in this section is selectively included
+from the <xref linkend="git-config(1)" /> documentation. The content is the same
+as what's found there:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>tag.forceSignAnnotated</emphasis>
+</term>
+<listitem>
+<simpara>
+        A boolean to specify whether annotated tags created should be GPG signed.
+        If <emphasis>--annotate</emphasis> is specified on the command line, it takes
+        precedence over this option.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>tag.sort</emphasis>
+</term>
+<listitem>
+<simpara>
+This variable controls the sort ordering of tags when displayed by <emphasis>git-tag</emphasis>.
+Without the <emphasis>--sort=&lt;value&gt;</emphasis> option provided, the value of this variable will
+be used as the default.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>tag.gpgSign</emphasis>
+</term>
+<listitem>
+<simpara>
+        A boolean to specify whether all tags should be GPG signed.
+        Use of this option when running in an automated script can
+        result in a large number of tags being signed. It is therefore
+        convenient to use an agent to avoid typing your GPG passphrase
+        several times. Note that this option doesn't affect tag signing
+        behavior enabled by <emphasis>-u &lt;keyid&gt;</emphasis> or <emphasis>--local-user=&lt;keyid&gt;</emphasis> options.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-tag(1)__notes">
+<title>NOTES</title>
+<simpara>When combining multiple <emphasis>--contains</emphasis> and <emphasis>--no-contains</emphasis> filters, only
+references that contain at least one of the <emphasis>--contains</emphasis> commits and
+contain none of the <emphasis>--no-contains</emphasis> commits are shown.</simpara>
+<simpara>When combining multiple <emphasis>--merged</emphasis> and <emphasis>--no-merged</emphasis> filters, only
+references that are reachable from at least one of the <emphasis>--merged</emphasis>
+commits and from none of the <emphasis>--no-merged</emphasis> commits are shown.</simpara>
+</simplesect>
+<simplesect id="git-tag(1)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="git-check-ref-format(1)" />.
+<xref linkend="git-config(1)" />.</simpara>
+</simplesect>
+<simplesect id="git-tag(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

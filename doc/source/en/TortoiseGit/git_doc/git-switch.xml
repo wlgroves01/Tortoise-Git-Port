@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-switch(1)">
+    <title>git-switch(1)</title>
+<indexterm>
+<primary>git-switch(1)</primary>
+</indexterm>
+<simplesect id="git-switch(1)__name">
+<title>NAME</title>
+<simpara>git-switch - Switch branches</simpara>
+</simplesect>
+<simplesect id="git-switch(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><code>git</code> <code>switch</code> [<emphasis>&lt;options&gt;</emphasis>] [<code>--no-guess</code>] <emphasis>&lt;branch&gt;</emphasis>
+<code>git</code> <code>switch</code> [<emphasis>&lt;options&gt;</emphasis>] <code>--detach</code> [<emphasis>&lt;start-point&gt;</emphasis>]
+<code>git</code> <code>switch</code> [<emphasis>&lt;options&gt;</emphasis>] (<code>-c</code>|<code>-C</code>) <emphasis>&lt;new-branch&gt;</emphasis> [<emphasis>&lt;start-point&gt;</emphasis>]
+<code>git</code> <code>switch</code> [<emphasis>&lt;options&gt;</emphasis>] <code>--orphan</code> <emphasis>&lt;new-branch&gt;</emphasis></literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-switch(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Switch to a specified branch. The working tree and the index are
+updated to match the branch. All new commits will be added to the tip
+of this branch.</simpara>
+<simpara>Optionally a new branch could be created with either <emphasis>-c</emphasis>, <emphasis>-C</emphasis>,
+automatically from a remote branch of same name (see <emphasis>--guess</emphasis>), or
+detach the working tree from any branch with <emphasis>--detach</emphasis>, along with
+switching.</simpara>
+<simpara>Switching branches does not require a clean index and working tree
+(i.e. no differences compared to <emphasis>HEAD</emphasis>). The operation is aborted
+however if the operation leads to loss of local changes, unless told
+otherwise with <emphasis>--discard-changes</emphasis> or <emphasis>--merge</emphasis>.</simpara>
+</simplesect>
+<simplesect id="git-switch(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>&lt;branch&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Branch to switch to.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>&lt;new-branch&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Name for the new branch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>&lt;start-point&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        The starting point for the new branch. Specifying a
+        <emphasis>&lt;start-point&gt;</emphasis> allows you to create a branch based on some
+        other point in history than where <emphasis>HEAD</emphasis> currently points. (Or,
+        in the case of <emphasis>--detach</emphasis>, allows you to inspect and detach
+        from some other point.)
+</simpara>
+<simpara>You can use the <emphasis>@{-&lt;N&gt;}</emphasis> syntax to refer to the <emphasis>&lt;N&gt;</emphasis>-th last
+branch/commit switched to using <emphasis>git switch</emphasis> or <emphasis>git checkout</emphasis>
+operation. You may also specify <emphasis>-</emphasis> which is synonymous to <emphasis>@{-1}</emphasis>.
+This is often used to switch quickly between two branches, or to undo
+a branch switch by mistake.</simpara>
+<simpara>As a special case, you may use <emphasis>&lt;rev-a&gt;...&lt;rev-b&gt;</emphasis> as a shortcut for the merge
+base of <emphasis>&lt;rev-a&gt;</emphasis> and <emphasis>&lt;rev-b&gt;</emphasis> if there is exactly one merge base. You can leave
+out at most one of <emphasis>&lt;rev-a&gt;</emphasis> and <emphasis>&lt;rev-b&gt;</emphasis>, in which case it defaults to <emphasis>HEAD</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-c &lt;new-branch&gt;</emphasis>
+</term>
+<term>
+<emphasis>--create &lt;new-branch&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Create a new branch named <emphasis>&lt;new-branch&gt;</emphasis> starting at
+        <emphasis>&lt;start-point&gt;</emphasis> before switching to the branch. This is the
+        transactional equivalent of
+</simpara>
+<screen>$ git branch &lt;new-branch&gt;
+$ git switch &lt;new-branch&gt;</screen>
+<simpara>that is to say, the branch is not reset/created unless <emphasis>git switch</emphasis> is
+successful (e.g., when the branch is in use in another worktree, not
+just the current branch stays the same, but the branch is not reset to
+the start-point, either).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-C &lt;new-branch&gt;</emphasis>
+</term>
+<term>
+<emphasis>--force-create &lt;new-branch&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Similar to <emphasis>--create</emphasis> except that if <emphasis>&lt;new-branch&gt;</emphasis> already
+        exists, it will be reset to <emphasis>&lt;start-point&gt;</emphasis>. This is a
+        convenient shortcut for:
+</simpara>
+<screen>$ git branch -f _&lt;new-branch&gt;_
+$ git switch _&lt;new-branch&gt;_</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-d</emphasis>
+</term>
+<term>
+<emphasis>--detach</emphasis>
+</term>
+<listitem>
+<simpara>
+        Switch to a commit for inspection and discardable
+        experiments. See the "DETACHED HEAD" section in
+        <xref linkend="git-checkout(1)" /> for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--guess</emphasis>
+</term>
+<term>
+<emphasis>--no-guess</emphasis>
+</term>
+<listitem>
+<simpara>
+        If <emphasis>&lt;branch&gt;</emphasis> is not found but there does exist a tracking
+        branch in exactly one remote (call it <emphasis>&lt;remote&gt;</emphasis>) with a
+        matching name, treat as equivalent to
+</simpara>
+<screen>$ git switch -c &lt;branch&gt; --track &lt;remote&gt;/&lt;branch&gt;</screen>
+<simpara>If the branch exists in multiple remotes and one of them is named by
+the <emphasis>checkout.defaultRemote</emphasis> configuration variable, we'll use that
+one for the purposes of disambiguation, even if the <emphasis>&lt;branch&gt;</emphasis> isn't
+unique across all remotes. Set it to e.g. <emphasis>checkout.defaultRemote=origin</emphasis>
+to always checkout remote branches from there if <emphasis>&lt;branch&gt;</emphasis> is
+ambiguous but exists on the <emphasis>origin</emphasis> remote. See also
+<emphasis>checkout.defaultRemote</emphasis> in <xref linkend="git-config(1)" />.</simpara>
+<simpara><emphasis>--guess</emphasis> is the default behavior. Use <emphasis>--no-guess</emphasis> to disable it.</simpara>
+<simpara>The default behavior can be set via the <emphasis>checkout.guess</emphasis> configuration
+variable.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-f</emphasis>
+</term>
+<term>
+<emphasis>--force</emphasis>
+</term>
+<listitem>
+<simpara>
+        An alias for <emphasis>--discard-changes</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--discard-changes</emphasis>
+</term>
+<listitem>
+<simpara>
+        Proceed even if the index or the working tree differs from
+        <emphasis>HEAD</emphasis>. Both the index and working tree are restored to match
+        the switching target. If <emphasis>--recurse-submodules</emphasis> is specified,
+        submodule content is also restored to match the switching
+        target. This is used to throw away local changes.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-m</emphasis>
+</term>
+<term>
+<emphasis>--merge</emphasis>
+</term>
+<listitem>
+<simpara>
+        If you have local modifications to one or more files that are
+        different between the current branch and the branch to which
+        you are switching, the command refuses to switch branches in
+        order to preserve your modifications in context.  However,
+        with this option, a three-way merge between the current
+        branch, your working tree contents, and the new branch is
+        done, and you will be on the new branch.
+</simpara>
+<simpara>When a merge conflict happens, the index entries for conflicting
+paths are left unmerged, and you need to resolve the conflicts
+and mark the resolved paths with <emphasis>git add</emphasis> (or <emphasis>git rm</emphasis> if the merge
+should result in deletion of the path).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--conflict=&lt;style&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        The same as <emphasis>--merge</emphasis> option above, but changes the way the
+        conflicting hunks are presented, overriding the
+        <emphasis>merge.conflictStyle</emphasis> configuration variable.  Possible values are
+        <emphasis>merge</emphasis> (default), <emphasis>diff3</emphasis>, and <emphasis>zdiff3</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-q</emphasis>
+</term>
+<term>
+<emphasis>--quiet</emphasis>
+</term>
+<listitem>
+<simpara>
+        Quiet, suppress feedback messages.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--progress</emphasis>
+</term>
+<term>
+<emphasis>--no-progress</emphasis>
+</term>
+<listitem>
+<simpara>
+        Progress status is reported on the standard error stream
+        by default when it is attached to a terminal, unless <emphasis>--quiet</emphasis>
+        is specified. This flag enables progress reporting even if not
+        attached to a terminal, regardless of <emphasis>--quiet</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>-t</emphasis>
+</term>
+<term>
+<emphasis>--track[ (direct|inherit)]</emphasis>
+</term>
+<listitem>
+<simpara>
+        When creating a new branch, set up "upstream" configuration.
+        <emphasis>-c</emphasis> is implied. See <emphasis>--track</emphasis> in <xref linkend="git-branch(1)" /> for
+        details.
+</simpara>
+<simpara>If no <emphasis>-c</emphasis> option is given, the name of the new branch will be derived
+from the remote-tracking branch, by looking at the local part of the
+refspec configured for the corresponding remote, and then stripping
+the initial part up to the "*".  This would tell us to use <emphasis>hack</emphasis> as
+the local branch when branching off of <emphasis>origin/hack</emphasis> (or
+<emphasis>remotes/origin/hack</emphasis>, or even <emphasis>refs/remotes/origin/hack</emphasis>).  If the
+given name has no slash, or the above guessing results in an empty
+name, the guessing is aborted.  You can explicitly give a name with
+<emphasis>-c</emphasis> in such a case.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--no-track</emphasis>
+</term>
+<listitem>
+<simpara>
+        Do not set up "upstream" configuration, even if the
+        <emphasis>branch.autoSetupMerge</emphasis> configuration variable is true.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--orphan &lt;new-branch&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Create a new unborn branch, named <emphasis>&lt;new-branch&gt;</emphasis>. All
+        tracked files are removed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--ignore-other-worktrees</emphasis>
+</term>
+<listitem>
+<simpara>
+        <emphasis>git switch</emphasis> refuses when the wanted ref is already
+        checked out by another worktree. This option makes it check
+        the ref out anyway. In other words, the ref can be held by
+        more than one worktree.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>--recurse-submodules</emphasis>
+</term>
+<term>
+<emphasis>--no-recurse-submodules</emphasis>
+</term>
+<listitem>
+<simpara>
+        Using <emphasis>--recurse-submodules</emphasis> will update the content of all
+        active submodules according to the commit recorded in the
+        superproject. If nothing (or <emphasis>--no-recurse-submodules</emphasis>) is
+        used, submodules working trees will not be updated. Just
+        like <xref linkend="git-submodule(1)" />, this will detach <emphasis>HEAD</emphasis> of the
+        submodules.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-switch(1)__examples">
+<title>EXAMPLES</title>
+<simpara>The following command switches to the "master" branch:</simpara>
+<screen>$ git switch master</screen>
+<simpara>After working in the wrong branch, switching to the correct branch
+would be done using:</simpara>
+<screen>$ git switch mytopic</screen>
+<simpara>However, your "wrong" branch and correct "mytopic" branch may differ
+in files that you have modified locally, in which case the above
+switch would fail like this:</simpara>
+<screen>$ git switch mytopic
+error: You have local changes to 'frotz'; not switching branches.</screen>
+<simpara>You can give the <emphasis>-m</emphasis> flag to the command, which would try a three-way
+merge:</simpara>
+<screen>$ git switch -m mytopic
+Auto-merging frotz</screen>
+<simpara>After this three-way merge, the local modifications are <emphasis>not</emphasis>
+registered in your index file, so <emphasis>git diff</emphasis> would show you what
+changes you made since the tip of the new branch.</simpara>
+<simpara>To switch back to the previous branch before we switched to mytopic
+(i.e. "master" branch):</simpara>
+<screen>$ git switch -</screen>
+<simpara>You can grow a new branch from any commit. For example, switch to
+"<emphasis>HEAD~3</emphasis>" and create branch "<emphasis>fixup</emphasis>":</simpara>
+<screen>$ git switch -c fixup HEAD~3
+Switched to a new branch 'fixup'</screen>
+<simpara>If you want to start a new branch from a remote branch of the same
+name:</simpara>
+<screen>$ git switch new-topic
+Branch `new-topic` set up to track remote branch `new-topic` from `origin`
+Switched to a new branch `new-topic`</screen>
+<simpara>To check out commit <emphasis>HEAD~3</emphasis> for temporary inspection or experiment
+without creating a new branch:</simpara>
+<screen>$ git switch --detach HEAD~3
+HEAD is now at 9fc9555312 Merge branch 'cc/shared-index-permbits'</screen>
+<simpara>If it turns out whatever you have done is worth keeping, you can
+always create a new name for it (without switching away):</simpara>
+<screen>$ git switch -c good-surprises</screen>
+</simplesect>
+<simplesect id="git-switch(1)__configuration">
+<title>CONFIGURATION</title>
+<simpara>Everything below this line in this section is selectively included
+from the <xref linkend="git-config(1)" /> documentation. The content is the same
+as what's found there:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>checkout.defaultRemote</emphasis>
+</term>
+<listitem>
+<simpara>
+        When you run <emphasis>git checkout &lt;something&gt;</emphasis>
+        or <emphasis>git switch &lt;something&gt;</emphasis> and only have one
+        remote, it may implicitly fall back on checking out and
+        tracking e.g. <emphasis>origin/&lt;something&gt;</emphasis>. This stops working as soon
+        as you have more than one remote with a <emphasis>&lt;something&gt;</emphasis>
+        reference. This setting allows for setting the name of a
+        preferred remote that should always win when it comes to
+        disambiguation. The typical use-case is to set this to
+        <emphasis>origin</emphasis>.
+</simpara>
+<simpara>Currently this is used by <xref linkend="git-switch(1)" /> and
+<xref linkend="git-checkout(1)" /> when <emphasis>git checkout &lt;something&gt;</emphasis>
+or <emphasis>git switch &lt;something&gt;</emphasis>
+will checkout the <emphasis>&lt;something&gt;</emphasis> branch on another remote,
+and by <xref linkend="git-worktree(1)" /> when <emphasis>git worktree add</emphasis> refers to a
+remote branch. This setting might be used for other checkout-like
+commands or functionality in the future.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>checkout.guess</emphasis>
+</term>
+<listitem>
+<simpara>
+        Provides the default value for the <emphasis>--guess</emphasis> or <emphasis>--no-guess</emphasis>
+        option in <emphasis>git checkout</emphasis> and <emphasis>git switch</emphasis>. See
+        <xref linkend="git-switch(1)" /> and <xref linkend="git-checkout(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>checkout.workers</emphasis>
+</term>
+<listitem>
+<simpara>
+        The number of parallel workers to use when updating the working tree.
+        The default is one, i.e. sequential execution. If set to a value less
+        than one, Git will use as many workers as the number of logical cores
+        available. This setting and <emphasis>checkout.thresholdForParallelism</emphasis> affect
+        all commands that perform checkout. E.g. checkout, clone, reset,
+        sparse-checkout, etc.
+</simpara>
+<note><simpara>Parallel checkout usually delivers better performance for repositories
+located on SSDs or over NFS. For repositories on spinning disks and/or machines
+with a small number of cores, the default sequential checkout often performs
+better. The size and compression level of a repository might also influence how
+well the parallel version performs.</simpara></note>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>checkout.thresholdForParallelism</emphasis>
+</term>
+<listitem>
+<simpara>
+        When running parallel checkout with a small number of files, the cost
+        of subprocess spawning and inter-process communication might outweigh
+        the parallelization gains. This setting allows you to define the minimum
+        number of files for which parallel checkout should be attempted. The
+        default is 100.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-switch(1)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="git-checkout(1)" />,
+<xref linkend="git-branch(1)" /></simpara>
+</simplesect>
+<simplesect id="git-switch(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

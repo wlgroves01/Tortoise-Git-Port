@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-index-pack(1)">
+    <title>git-index-pack(1)</title>
+<indexterm>
+<primary>git-index-pack(1)</primary>
+</indexterm>
+<simplesect id="git-index-pack(1)__name">
+<title>NAME</title>
+<simpara>git-index-pack - Build pack index file for an existing packed archive</simpara>
+</simplesect>
+<simplesect id="git-index-pack(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><emphasis>git index-pack</emphasis> [-v] [-o &lt;index-file&gt;] [--[no-]rev-index] &lt;pack-file&gt;
+<emphasis>git index-pack</emphasis> --stdin [--fix-thin] [--keep] [-v] [-o &lt;index-file&gt;]
+                  [--[no-]rev-index] [&lt;pack-file&gt;]</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-index-pack(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Reads a packed archive (.pack) from the specified file,
+builds a pack index file (.idx) for it, and optionally writes a
+reverse-index (.rev) for the specified pack. The packed
+archive, together with the pack index, can then be placed in
+the objects/pack/ directory of a Git repository.</simpara>
+</simplesect>
+<simplesect id="git-index-pack(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-v
+</term>
+<listitem>
+<simpara>
+        Be verbose about what is going on, including progress status.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-o &lt;index-file&gt;
+</term>
+<listitem>
+<simpara>
+        Write the generated pack index into the specified
+        file.  Without this option the name of pack index
+        file is constructed from the name of packed archive
+        file by replacing .pack with .idx (and the program
+        fails if the name of packed archive does not end
+        with .pack).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--rev-index
+</term>
+<term>
+--no-rev-index
+</term>
+<listitem>
+<simpara>
+        When this flag is provided, generate a reverse index
+        (a <emphasis>.rev</emphasis> file) corresponding to the given pack. If
+        <emphasis>--verify</emphasis> is given, ensure that the existing
+        reverse index is correct. Takes precedence over
+        <emphasis>pack.writeReverseIndex</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        When this flag is provided, the pack is read from stdin
+        instead and a copy is then written to &lt;pack-file&gt;. If
+        &lt;pack-file&gt; is not specified, the pack is written to
+        objects/pack/ directory of the current Git repository with
+        a default name determined from the pack content.  If
+        &lt;pack-file&gt; is not specified consider using --keep to
+        prevent a race condition between this process and
+        <emphasis>git repack</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--fix-thin
+</term>
+<listitem>
+<simpara>
+        Fix a "thin" pack produced by <emphasis>git pack-objects --thin</emphasis> (see
+        <xref linkend="git-pack-objects(1)" /> for details) by adding the
+        excluded objects the deltified objects are based on to the
+        pack. This option only makes sense in conjunction with --stdin.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--keep
+</term>
+<listitem>
+<simpara>
+        Before moving the index into its final destination
+        create an empty .keep file for the associated pack file.
+        This option is usually necessary with --stdin to prevent a
+        simultaneous <emphasis>git repack</emphasis> process from deleting
+        the newly constructed pack and index before refs can be
+        updated to use objects contained in the pack.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--keep=&lt;msg&gt;
+</term>
+<listitem>
+<simpara>
+        Like --keep, create a .keep file before moving the index into
+        its final destination.  However, instead of creating an empty file
+        place <emphasis>&lt;msg&gt;</emphasis> followed by an LF into the .keep file.  The <emphasis>&lt;msg&gt;</emphasis>
+        message can later be searched for within all .keep files to
+        locate any which have outlived their usefulness.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--index-version=&lt;version&gt;[,&lt;offset&gt;]
+</term>
+<listitem>
+<simpara>
+        This is intended to be used by the test suite only. It allows
+        to force the version for the generated pack index, and to force
+        64-bit index entries on objects located above the given offset.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--strict[=&lt;msg-id&gt;=&lt;severity&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        Die, if the pack contains broken objects or links. An optional
+        comma-separated list of <emphasis>&lt;msg-id&gt;=&lt;severity&gt;</emphasis> can be passed to change
+        the severity of some possible issues, e.g.,
+         <emphasis>--strict="missingEmail=ignore,badTagName=error"</emphasis>. See the entry for the
+        <emphasis>fsck.&lt;msg-id&gt;</emphasis> configuration options in <xref linkend="git-fsck(1)" /> for more
+        information on the possible values of <emphasis>&lt;msg-id&gt;</emphasis> and <emphasis>&lt;severity&gt;</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--progress-title
+</term>
+<listitem>
+<simpara>
+        For internal use only.
+</simpara>
+<simpara>Set the title of the progress bar. The title is "Receiving objects" by
+default and "Indexing objects" when <emphasis>--stdin</emphasis> is specified.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--check-self-contained-and-connected
+</term>
+<listitem>
+<simpara>
+        Die if the pack contains broken links. For internal use only.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--fsck-objects[=&lt;msg-id&gt;=&lt;severity&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        Die if the pack contains broken objects, but unlike <emphasis>--strict</emphasis>, don't
+        choke on broken links. If the pack contains a tree pointing to a
+        .gitmodules blob that does not exist, prints the hash of that blob
+        (for the caller to check) after the hash that goes into the name of the
+        pack/idx file (see "Notes").
+</simpara>
+<simpara>An optional comma-separated list of <emphasis>&lt;msg-id&gt;=&lt;severity&gt;</emphasis> can be passed to
+change the severity of some possible issues, e.g.,
+<emphasis>--fsck-objects="missingEmail=ignore,badTagName=ignore"</emphasis>. See the entry for the
+<emphasis>fsck.&lt;msg-id&gt;</emphasis> configuration options in <xref linkend="git-fsck(1)" /> for more
+information on the possible values of <emphasis>&lt;msg-id&gt;</emphasis> and <emphasis>&lt;severity&gt;</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--threads=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        Specifies the number of threads to spawn when resolving
+        deltas. This requires that index-pack be compiled with
+        pthreads otherwise this option is ignored with a warning.
+        This is meant to reduce packing time on multiprocessor
+        machines. The required amount of memory for the delta search
+        window is however multiplied by the number of threads.
+        Specifying 0 will cause Git to auto-detect the number of CPU's
+        and use maximum 3 threads.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--max-input-size=&lt;size&gt;
+</term>
+<listitem>
+<simpara>
+        Die, if the pack is larger than &lt;size&gt;.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--object-format=&lt;hash-algorithm&gt;
+</term>
+<listitem>
+<simpara>
+        Specify the given object format (hash algorithm) for the pack.  The valid
+        values are <emphasis>sha1</emphasis> and (if enabled) <emphasis>sha256</emphasis>.  The default is the algorithm for
+        the current repository (set by <emphasis>extensions.objectFormat</emphasis>), or <emphasis>sha1</emphasis> if no
+        value is set or outside a repository.
+</simpara>
+<simpara>This option cannot be used with --stdin.</simpara>
+<simpara>Note: At present, there is no interoperability between SHA-256
+repositories and SHA-1 repositories.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Historically, we warned that SHA-256 repositories may later need
+backward incompatible changes when we introduce such interoperability
+features. Today, we only expect compatible changes. Furthermore, if such
+changes prove to be necessary, it can be expected that SHA-256 repositories
+created with today's Git will be usable by future versions of Git
+without data loss.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+--promisor[=&lt;message&gt;]
+</term>
+<listitem>
+<simpara>
+        Before committing the pack-index, create a .promisor file for this
+        pack. Particularly helpful when writing a promisor pack with --fix-thin
+        since the name of the pack is not final until the pack has been fully
+        written. If a <emphasis>&lt;message&gt;</emphasis> is provided, then that content will be
+        written to the .promisor file for future reference. See
+        <ulink url="https://www.kernel.org/pub/software/scm/git/docs/technical/partial-clone.html"><citetitle>partial clone</citetitle></ulink> for more information.
+</simpara>
+<simpara>Also, if there are objects in the given pack that references non-promisor
+objects (in the repo), repacks those non-promisor objects into a promisor
+pack. This avoids a situation in which a repo has non-promisor objects that are
+accessible through promisor objects.</simpara>
+<simpara>Requires &lt;pack-file&gt; to not be specified.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-index-pack(1)__notes">
+<title>NOTES</title>
+<simpara>Once the index has been created, the hash that goes into the name of
+the pack/idx file is printed to stdout. If --stdin was
+also used then this is prefixed by either "pack\t", or "keep\t" if a
+new .keep file was successfully created. This is useful to remove a
+.keep file used as a lock to prevent the race with <emphasis>git repack</emphasis>
+mentioned above.</simpara>
+</simplesect>
+<simplesect id="git-index-pack(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

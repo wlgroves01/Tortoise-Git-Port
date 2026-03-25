@@ -1,0 +1,6 @@
+Only the following folders are imported:
+include
+src
+win32
+
+apply backgroundcolors.patch

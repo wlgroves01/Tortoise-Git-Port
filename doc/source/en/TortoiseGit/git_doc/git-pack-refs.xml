@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-pack-refs(1)">
+    <title>git-pack-refs(1)</title>
+<indexterm>
+<primary>git-pack-refs(1)</primary>
+</indexterm>
+<simplesect id="git-pack-refs(1)__name">
+<title>NAME</title>
+<simpara>git-pack-refs - Pack heads and tags for efficient repository access</simpara>
+</simplesect>
+<simplesect id="git-pack-refs(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><emphasis>git pack-refs</emphasis> [--all] [--no-prune] [--auto] [--include &lt;pattern&gt;] [--exclude &lt;pattern&gt;]</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-pack-refs(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Traditionally, tips of branches and tags (collectively known as
+<emphasis>refs</emphasis>) were stored one file per ref in a (sub)directory
+under <emphasis>$GIT_DIR/refs</emphasis>
+directory.  While many branch tips tend to be updated often,
+most tags and some branch tips are never updated.  When a
+repository has hundreds or thousands of tags, this
+one-file-per-ref format both wastes storage and hurts
+performance.</simpara>
+<simpara>This command is used to solve the storage and performance
+problem by storing the refs in a single file,
+<emphasis>$GIT_DIR/packed-refs</emphasis>.  When a ref is missing from the
+traditional <emphasis>$GIT_DIR/refs</emphasis> directory hierarchy, it is looked
+up in this
+file and used if found.</simpara>
+<simpara>Subsequent updates to branches always create new files under
+<emphasis>$GIT_DIR/refs</emphasis> directory hierarchy.</simpara>
+<simpara>A recommended practice to deal with a repository with too many
+refs is to pack its refs with <emphasis>--all</emphasis> once, and
+occasionally run <emphasis>git pack-refs</emphasis>.  Tags are by
+definition stationary and are not expected to change.  Branch
+heads will be packed with the initial <emphasis>pack-refs --all</emphasis>, but
+only the currently active branch heads will become unpacked,
+and the next <emphasis>pack-refs</emphasis> (without <emphasis>--all</emphasis>) will leave them
+unpacked.</simpara>
+</simplesect>
+<simplesect id="git-pack-refs(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--all
+</term>
+<listitem>
+<simpara>
+The command by default packs all tags and refs that are already
+packed, and leaves other refs
+alone.  This is because branches are expected to be actively
+developed and packing their tips does not help performance.
+This option causes all refs to be packed as well, with the exception
+of hidden refs, broken refs, and symbolic refs. Useful for a repository
+with many branches of historical interests.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-prune
+</term>
+<listitem>
+<simpara>
+The command usually removes loose refs under <emphasis>$GIT_DIR/refs</emphasis>
+hierarchy after packing them.  This option tells it not to.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--auto
+</term>
+<listitem>
+<simpara>
+Pack refs as needed depending on the current state of the ref database. The
+behavior depends on the ref format used by the repository and may change in the
+future.
+</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+"files": Loose references are packed into the <emphasis>packed-refs</emphasis> file
+          based on the ratio of loose references to the size of the
+          <emphasis>packed-refs</emphasis> file. The bigger the <emphasis>packed-refs</emphasis> file, the more loose
+          references need to exist before we repack.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+"reftable": Tables are compacted such that they form a geometric
+          sequence. For two tables N and N+1, where N+1 is newer, this
+          maintains the property that N is at least twice as big as N+1. Only
+          tables that violate this property are compacted.
+</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--include &lt;pattern&gt;
+</term>
+<listitem>
+<simpara>
+Pack refs based on a <emphasis>glob(7)</emphasis> pattern. Repetitions of this option
+accumulate inclusion patterns. If a ref is both included in <emphasis>--include</emphasis> and
+<emphasis>--exclude</emphasis>, <emphasis>--exclude</emphasis> takes precedence. Using <emphasis>--include</emphasis> will preclude all
+tags from being included by default. Symbolic refs and broken refs will never
+be packed. When used with <emphasis>--all</emphasis>, it will be a noop. Use <emphasis>--no-include</emphasis> to clear
+and reset the list of patterns.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--exclude &lt;pattern&gt;
+</term>
+<listitem>
+<simpara>
+Do not pack refs matching the given <emphasis>glob(7)</emphasis> pattern. Repetitions of this option
+accumulate exclusion patterns. Use <emphasis>--no-exclude</emphasis> to clear and reset the list of
+patterns. If a ref is already packed, including it with <emphasis>--exclude</emphasis> will not
+unpack it.
+</simpara>
+<simpara>When used with <emphasis>--all</emphasis>, pack only loose refs which do not match any of
+the provided <emphasis>--exclude</emphasis> patterns.</simpara>
+<simpara>When used with <emphasis>--include</emphasis>, refs provided to <emphasis>--include</emphasis>, minus refs that are
+provided to <emphasis>--exclude</emphasis> will be packed.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-pack-refs(1)__bugs">
+<title>BUGS</title>
+<simpara>Older documentation written before the packed-refs mechanism was
+introduced may still say things like ".git/refs/heads/&lt;branch&gt; file
+exists" when it means "branch &lt;branch&gt; exists".</simpara>
+</simplesect>
+<simplesect id="git-pack-refs(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>

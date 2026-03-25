@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect2 SYSTEM "../../../dtd/dblite.dtd">
+
+<sect2 lang="en" id="git-upload-pack(1)">
+    <title>git-upload-pack(1)</title>
+<indexterm>
+<primary>git-upload-pack(1)</primary>
+</indexterm>
+<simplesect id="git-upload-pack(1)__name">
+<title>NAME</title>
+<simpara>git-upload-pack - Send objects packed back to git-fetch-pack</simpara>
+</simplesect>
+<simplesect id="git-upload-pack(1)__synopsis">
+<title>SYNOPSIS</title>
+<blockquote>
+<literallayout><emphasis>git-upload-pack</emphasis> [--[no-]strict] [--timeout=&lt;n&gt;] [--stateless-rpc]
+                  [--advertise-refs] &lt;directory&gt;</literallayout>
+</blockquote>
+</simplesect>
+<simplesect id="git-upload-pack(1)__description">
+<title>DESCRIPTION</title>
+<simpara>Invoked by <emphasis>git fetch-pack</emphasis>, learns what
+objects the other side is missing, and sends them after packing.</simpara>
+<simpara>This command is usually not invoked directly by the end user.
+The UI for the protocol is on the <emphasis>git fetch-pack</emphasis> side, and the
+program pair is meant to be used to pull updates from a remote
+repository.  For push operations, see <emphasis>git send-pack</emphasis>.</simpara>
+</simplesect>
+<simplesect id="git-upload-pack(1)__options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--strict
+</term>
+<term>
+--no-strict
+</term>
+<listitem>
+<simpara>
+        Do not try &lt;directory&gt;/.git/ if &lt;directory&gt; is not a Git directory.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--timeout=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        Interrupt transfer after &lt;n&gt; seconds of inactivity.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stateless-rpc
+</term>
+<listitem>
+<simpara>
+        Perform only a single read-write cycle with stdin and stdout.
+        This fits with the HTTP POST request processing model where
+        a program may read the request, write a response, and must exit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--http-backend-info-refs
+</term>
+<listitem>
+<simpara>
+        Used by <xref linkend="git-http-backend(1)" /> to serve up
+        <emphasis>$GIT_URL/info/refs?service=git-upload-pack</emphasis> requests. See
+        "Smart Clients" in <xref linkend="gitprotocol-http(5)" /> and "HTTP
+        Transport" in the <xref linkend="gitprotocol-v2(5)" />
+        documentation. Also understood by
+        <xref linkend="git-receive-pack(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;directory&gt;
+</term>
+<listitem>
+<simpara>
+        The repository to sync from.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-upload-pack(1)__environment">
+<title>ENVIRONMENT</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>GIT_PROTOCOL</emphasis>
+</term>
+<listitem>
+<simpara>
+        Internal variable used for handshaking the wire protocol. Server
+        admins may need to configure some transports to allow this
+        variable to be passed. See the discussion in <xref linkend="git(1)" />.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>GIT_NO_LAZY_FETCH</emphasis>
+</term>
+<listitem>
+<simpara>
+        When cloning or fetching from a partial repository (i.e., one
+        itself cloned with <emphasis>--filter</emphasis>), the server-side <emphasis>upload-pack</emphasis>
+        may need to fetch extra objects from its upstream in order to
+        complete the request. By default, <emphasis>upload-pack</emphasis> will refuse to
+        perform such a lazy fetch, because <emphasis>git fetch</emphasis> may run arbitrary
+        commands specified in configuration and hooks of the source
+        repository (and <emphasis>upload-pack</emphasis> tries to be safe to run even in
+        untrusted <emphasis>.git</emphasis> directories).
+</simpara>
+<simpara>This is implemented by having <emphasis>upload-pack</emphasis> internally set the
+<emphasis>GIT_NO_LAZY_FETCH</emphasis> variable to <emphasis>1</emphasis>. If you want to override it
+(because you are fetching from a partial clone, and you are sure
+you trust it), you can explicitly set <emphasis>GIT_NO_LAZY_FETCH</emphasis> to
+<emphasis>0</emphasis>.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</simplesect>
+<simplesect id="git-upload-pack(1)__security">
+<title>SECURITY</title>
+<simpara>Most Git commands should not be run in an untrusted <emphasis>.git</emphasis> directory
+(see the section <emphasis>SECURITY</emphasis> in <xref linkend="git(1)" />). <emphasis>upload-pack</emphasis> tries to
+avoid any dangerous configuration options or hooks from the repository
+it's serving, making it safe to clone an untrusted directory and run
+commands on the resulting clone.</simpara>
+<simpara>For an extra level of safety, you may be able to run <emphasis>upload-pack</emphasis> as an
+alternate user. The details will be platform dependent, but on many
+systems you can run:</simpara>
+<literallayout class="monospaced">git clone --no-local --upload-pack='sudo -u nobody git-upload-pack' ...</literallayout>
+</simplesect>
+<simplesect id="git-upload-pack(1)__see_also">
+<title>SEE ALSO</title>
+<simpara><xref linkend="gitnamespaces(7)" /></simpara>
+</simplesect>
+<simplesect id="git-upload-pack(1)__git">
+<title>GIT</title>
+<simpara>Part of the <xref linkend="git(1)" /> suite</simpara>
+</simplesect>
+</sect2>
