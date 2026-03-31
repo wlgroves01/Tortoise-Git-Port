@@ -19,7 +19,7 @@
 //
 
 #pragma once
-#include "SysProgressDlg.h"
+#include "MiscUI/SysProgressDlg.h"
 #include "Patch.h"
 
 class GitPatch

@@ -19,6 +19,8 @@
 //
 #pragma once
 
+#include "LinuxTypeWrapper.h"
+
 /**
  * \ingroup Utils
  * A wrapper class for the IProgressDialog interface. Thats
