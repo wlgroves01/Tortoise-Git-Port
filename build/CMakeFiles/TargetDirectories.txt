@@ -1,5 +1,0 @@
-/home/wyattg/CodingProjects/tortoise-git/TortoiseGit/build/CMakeFiles/edit_cache.dir
-/home/wyattg/CodingProjects/tortoise-git/TortoiseGit/build/CMakeFiles/rebuild_cache.dir
-/home/wyattg/CodingProjects/tortoise-git/TortoiseGit/build/src/Git/CMakeFiles/git-wrapper.dir
-/home/wyattg/CodingProjects/tortoise-git/TortoiseGit/build/src/Git/CMakeFiles/edit_cache.dir
-/home/wyattg/CodingProjects/tortoise-git/TortoiseGit/build/src/Git/CMakeFiles/rebuild_cache.dir

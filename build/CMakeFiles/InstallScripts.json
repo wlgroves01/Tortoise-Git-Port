@@ -1,8 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/wyattg/CodingProjects/tortoise-git/TortoiseGit/build/cmake_install.cmake",
-		"/home/wyattg/CodingProjects/tortoise-git/TortoiseGit/build/src/Git/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

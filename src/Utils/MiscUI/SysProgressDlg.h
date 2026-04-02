@@ -20,6 +20,8 @@
 #pragma once
 
 #include "LinuxTypeWrapper.h"
+#include <X11/Xlib.h>
+#include <memory>
 
 /**
  * \ingroup Utils
@@ -170,7 +172,8 @@ public:
 	bool EnsureValid();
 
 protected:
-	ATL::CComPtr<IProgressDialog> m_pIDlg;
+	// ATL::CComPtr<IProgressDialog> m_pIDlg;
+	std::unique_ptr<IProgressDialog> m_pIDlg;
 	bool				m_isVisible = false;
 	DWORD				m_dwDlgFlags = PROGDLG_NORMAL;
 	HWND m_hWndProgDlg = nullptr;
